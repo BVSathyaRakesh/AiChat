@@ -9,22 +9,16 @@ import SwiftUI
 
 struct AppView: View {
     
-    @State private var showTabBar = false
+    @AppStorage("showTabBarView") var showTabBar = false
     
     var body: some View {
         AppViewBuilder(
             showTabBar: showTabBar,
             tabbarView: {
-                ZStack {
-                    Color.red.ignoresSafeArea()
-                    Text("TabBar")
-                }
+                TabBarView()
             },
             onBoardingView: {
-                ZStack {
-                    Color.blue.ignoresSafeArea()
-                    Text("OnBoarding")
-                }
+               WelcomeView()
             }
         )
         .onTapGesture {
@@ -33,11 +27,9 @@ struct AppView: View {
     }
 }
 
-#Preview {
-    @Previewable @State var showTabBar: Bool = true
-    AppView()
+#Preview("TabBar preview") {
+    AppView(showTabBar: true)
 }
-#Preview {
-    @Previewable @State var showTabBar: Bool = false
-    AppView(showTabBar)
+#Preview("Welcome preview") {
+    AppView(showTabBar: false)
 }

@@ -9,7 +9,7 @@ import SwiftUI
 
 struct AppViewBuilder<TabBarView: View, OnBoardingView: View>: View {
     
-    var showTabBar: Bool = false
+    var showTabBar: Bool = true
     
     @ViewBuilder var tabbarView: TabBarView
     @ViewBuilder var onBoardingView: OnBoardingView
@@ -31,22 +31,16 @@ struct AppViewBuilder<TabBarView: View, OnBoardingView: View>: View {
 
 private struct Preview: View {
     
-    @State private var showTabBar = false
+    @State private var showTabBar = true
     
     var body: some View {
         AppViewBuilder(
             showTabBar: showTabBar,
             tabbarView: {
-                ZStack {
-                    Color.red.ignoresSafeArea()
-                    Text("TabBar")
-                }
+                TabBarView()
             },
             onBoardingView: {
-                ZStack {
-                    Color.blue.ignoresSafeArea()
-                    Text("OnBoarding")
-                }
+                WelcomeView()
             }
         )
         .onTapGesture {
