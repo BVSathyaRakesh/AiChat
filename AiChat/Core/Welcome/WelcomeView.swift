@@ -16,11 +16,11 @@ struct WelcomeView: View {
             VStack(spacing: 8) {
                 ImageLoaderView(urlString: imageName)
                     .ignoresSafeArea()
-                    titleSection
-                        .padding(.top, 24)
-                    ctaButtons
-                        .padding(16)
-                    policyLinks
+                titleSection
+                    .padding(.top, 24)
+                ctaButtons
+                    .padding(16)
+                policyLinks
             }
         }
     }
@@ -40,7 +40,7 @@ struct WelcomeView: View {
     private var ctaButtons: some View {
         VStack {
             NavigationLink {
-                OnBoardingCompletedView()
+                OnBoardingIntroView()
             } label: {
                 Text("Get Started")
                     .callToFunctionButton()

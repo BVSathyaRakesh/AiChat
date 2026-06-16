@@ -32,6 +32,8 @@ struct OnBoardingCompletedView: View {
 }
 
 #Preview {
-    OnBoardingCompletedView()
-        .environment(AppState())
+    NavigationStack {
+        OnBoardingCompletedView()
+            .environment(AppState())
+    }
 }
