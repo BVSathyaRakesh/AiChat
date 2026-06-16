@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		8AB854CF2FE16B7500B3391F /* SDWebImageSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 8AB854CE2FE16B7500B3391F /* SDWebImageSwiftUI */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		8AB853BA2FDF09B500B3391F /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -52,6 +56,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8AB854CF2FE16B7500B3391F /* SDWebImageSwiftUI in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -113,6 +118,7 @@
 			);
 			name = AiChat;
 			packageProductDependencies = (
+				8AB854CE2FE16B7500B3391F /* SDWebImageSwiftUI */,
 			);
 			productName = AiChat;
 			productReference = 8AB853AC2FDF09B400B3391F /* AiChat.app */;
@@ -196,6 +202,9 @@
 			);
 			mainGroup = 8AB853A32FDF09B400B3391F;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				8AB854CD2FE16B7500B3391F /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 8AB853AD2FDF09B400B3391F /* Products */;
 			projectDirPath = "";
@@ -235,6 +244,7 @@
 /* Begin PBXShellScriptBuildPhase section */
 		8AB853DA2FDF14D200B3391F /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
 			files = (
 			);
@@ -616,6 +626,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		8AB854CD2FE16B7500B3391F /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SDWebImage/SDWebImageSwiftUI.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.1.4;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		8AB854CE2FE16B7500B3391F /* SDWebImageSwiftUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8AB854CD2FE16B7500B3391F /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */;
+			productName = SDWebImageSwiftUI;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 8AB853A42FDF09B400B3391F /* Project object */;
 }

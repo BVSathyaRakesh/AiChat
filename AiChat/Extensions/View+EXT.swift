@@ -16,4 +16,8 @@ extension View {
             .background(.accent)
             .clipShape(RoundedRectangle(cornerRadius: 16.0))
     }
+    
+    func tappableBackground() -> some View {
+        background(Color.black.opacity((0.001)))
+    }
 }
