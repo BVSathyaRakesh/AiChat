@@ -12,16 +12,14 @@ struct WelcomeView: View {
     @State var imageName = Constants.randomImage
     
     var body: some View {
-        NavigationStack {
-            VStack(spacing: 8) {
-                ImageLoaderView(urlString: imageName)
-                    .ignoresSafeArea()
-                titleSection
-                    .padding(.top, 24)
-                ctaButtons
-                    .padding(16)
-                policyLinks
-            }
+        VStack(spacing: 8) {
+            ImageLoaderView(urlString: imageName)
+                .ignoresSafeArea()
+            titleSection
+                .padding(.top, 24)
+            ctaButtons
+                .padding(16)
+            policyLinks
         }
     }
     

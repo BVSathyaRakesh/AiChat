@@ -18,7 +18,9 @@ struct AppView: View {
                 TabBarView()
             },
             onBoardingView: {
-               WelcomeView()
+                NavigationStack {
+                    WelcomeView()
+                }
             }
         )
         .environment(appState)

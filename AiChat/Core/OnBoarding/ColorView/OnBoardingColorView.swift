@@ -20,7 +20,7 @@ struct OnBoardingColorView: View {
         .safeAreaInset(edge: .bottom, content: {
             ZStack {
                 if let selectedColor {
-                   ctaButtons
+                   ctaButtons(selectedColor: selectedColor)
                     .transition(AnyTransition.move(edge: .bottom))
                 }
             }
@@ -28,6 +28,7 @@ struct OnBoardingColorView: View {
             .background(Color(uiColor: .systemBackground))
         })
         .animation(.bouncy, value: selectedColor)
+        .toolbar(.hidden, for: .navigationBar)
         
     }
     
@@ -60,9 +61,9 @@ struct OnBoardingColorView: View {
             }
         )
     }
-    private var ctaButtons: some View{
+    private func ctaButtons(selectedColor: Color) -> some View {
         NavigationLink {
-            OnBoardingCompletedView()
+            OnBoardingCompletedView(selectedColor: selectedColor)
         } label: {
             Text("Continue")
                 .callToFunctionButton()
@@ -74,4 +75,5 @@ struct OnBoardingColorView: View {
     NavigationStack {
         OnBoardingColorView()
     }
+    .environment(AppState())
 }
