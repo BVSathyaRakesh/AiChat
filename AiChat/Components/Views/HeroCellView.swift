@@ -29,9 +29,7 @@ struct HeroCellView: View {
                 .foregroundStyle(.white)
                 .padding(16)
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .background(
-                    gradientItem
-                )
+                .addingGradientBackgroundFortext()
         })
         .cornerRadius(16)
     }
