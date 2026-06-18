@@ -17,7 +17,7 @@ struct HeroCellView: View {
         ZStack {
             if let image {
                 ImageLoaderView(urlString: image)
-            }else {
+            } else {
                 Rectangle()
                     .fill(.accent)
             }
@@ -25,38 +25,46 @@ struct HeroCellView: View {
         .overlay(
             alignment: .bottomLeading,
             content: {
-                VStack(alignment: .leading, spacing: 4) {
-                    Spacer()
-                    if let title {
-                        Text(title)
-                            .font(.headline)
-                    }
-                    if let subtitle {
-                        Text(subtitle)
-                            .font(.subheadline)
-                    }
-                }
+               textContainer
                 .foregroundStyle(.white)
                 .padding(16)
-                .frame(maxWidth:.infinity, alignment: .leading)
+                .frame(maxWidth: .infinity, alignment: .leading)
                 .background(
-                    LinearGradient(
-                        colors: [
-                            Color.black.opacity(0),
-                            Color.black.opacity(0.3),
-                            Color.black.opacity(0.4)],
-                        startPoint: .top,
-                        endPoint: .bottom
-                    )
+                    gradientItem
                 )
         })
         .cornerRadius(16)
     }
+
+    private var textContainer: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Spacer()
+            if let title {
+                Text(title)
+                    .font(.headline)
+            }
+            if let subtitle {
+                Text(subtitle)
+                    .font(.subheadline)
+            }
+        }
+    }
+    
+    private var gradientItem: some View {
+        LinearGradient(
+            colors: [
+                Color.black.opacity(0),
+                Color.black.opacity(0.3),
+                Color.black.opacity(0.4)],
+            startPoint: .top,
+            endPoint: .bottom
+        )
+    }
 }
 
 #Preview {
-    ScrollView{
-        VStack{
+    ScrollView {
+        VStack {
             HeroCellView()
                 .frame(width: 300, height: 200)
             

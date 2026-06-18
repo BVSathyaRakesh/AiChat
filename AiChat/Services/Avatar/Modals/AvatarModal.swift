@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct AvatarModal {
+struct AvatarModal: Hashable {
     let avatarId: String
     let name: String?
     let charcterOption: CharecterOption?
@@ -46,7 +46,7 @@ struct AvatarModal {
     }
     
     static var mocks: [AvatarModal] = [
-        AvatarModal(avatarId: UUID().uuidString, name: "Alpha", charcterOption: .alien, charcterAction: .smiling, charcetrLocation: .park,profileImageName: Constants.randomImage, authorId: UUID().uuidString, dateCreated: .now),
+        AvatarModal(avatarId: UUID().uuidString,name: "Alpha", charcterOption: .alien,charcterAction: .smiling, charcetrLocation: .park,profileImageName: Constants.randomImage,authorId: UUID().uuidString,dateCreated: .now),
         AvatarModal(avatarId: UUID().uuidString, name: "Beta", charcterOption: .dog, charcterAction: .eating, charcetrLocation: .city,profileImageName: Constants.randomImage, authorId: UUID().uuidString, dateCreated: .now),
         AvatarModal(avatarId: UUID().uuidString, name: "Gama", charcterOption: .cat, charcterAction: .drinking, charcetrLocation: .desert,profileImageName: Constants.randomImage, authorId: UUID().uuidString, dateCreated: .now),
         AvatarModal(avatarId: UUID().uuidString, name: "Delta", charcterOption: .woman, charcterAction: .fighting, charcetrLocation: .musem,profileImageName: Constants.randomImage, authorId: UUID().uuidString, dateCreated: .now),
