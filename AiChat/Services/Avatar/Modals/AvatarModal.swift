@@ -46,7 +46,7 @@ struct AvatarModal: Hashable {
     }
     
     static var mocks: [AvatarModal] = [
-        AvatarModal(avatarId: UUID().uuidString, name: "Alpha",charcterOption:.alien,charcterAction:.smiling,charcetrLocation:.park,profileImageName: Constants.randomImage,authorId: UUID().uuidString,dateCreated: .now),
+        AvatarModal(avatarId: UUID().uuidString, name: "Alpha", charcterOption: .alien,charcterAction: .smiling,charcetrLocation: .park,profileImageName: Constants.randomImage,authorId: UUID().uuidString,dateCreated: .now),
         AvatarModal(avatarId: UUID().uuidString, name: "Beta", charcterOption: .dog, charcterAction: .eating, charcetrLocation: .city,profileImageName: Constants.randomImage, authorId: UUID().uuidString, dateCreated: .now),
         AvatarModal(avatarId: UUID().uuidString, name: "Gama", charcterOption: .cat, charcterAction: .drinking, charcetrLocation: .desert,profileImageName: Constants.randomImage, authorId: UUID().uuidString, dateCreated: .now),
         AvatarModal(avatarId: UUID().uuidString, name: "Delta", charcterOption: .woman, charcterAction: .fighting, charcetrLocation: .musem,profileImageName: Constants.randomImage, authorId: UUID().uuidString, dateCreated: .now),
@@ -71,23 +71,33 @@ struct AvatarDescriptionBuilder {
         self.charceterLocation = avatar.charcetrLocation ?? .default
     }
     
-    var charcterDescription: String  {
-        "A \(charecterOption.rawValue) that is \(charecterAction.rawValue) in the \(charceterLocation.rawValue)"
+    var charcterDescription: String {
+        let prefix = charecterOption.startsWithVowel ? "An" : "A"
+        return "\(prefix) \(charecterOption.rawValue) that is \(charecterAction.rawValue) in the \(charceterLocation.rawValue)"
     }
 }
 
-enum CharecterOption: String, CaseIterable, Hashable{
+enum CharecterOption: String, CaseIterable, Hashable {
     case man, woman, cat, dog, alien
     
-    static var `default` : Self {
+    static var `default`: Self {
         .man
+    }
+    
+    var startsWithVowel: Bool {
+        switch self {
+        case .alien:
+            return true
+        default:
+            return false
+        }
     }
 }
 
 enum CharecterAction: String {
     case smiling, sitting, standing, walking, running, eating, drinking, working, crying, relaxing, fighting
     
-    static var `default` : Self {
+    static var `default`: Self {
         .smiling
     }
 }
@@ -95,7 +105,7 @@ enum CharecterAction: String {
 enum CharcterLocation: String {
     case park, mall, musem, city, desert, forest, space
     
-    static var `default` : Self {
+    static var `default`: Self {
         .park
     }
 }
