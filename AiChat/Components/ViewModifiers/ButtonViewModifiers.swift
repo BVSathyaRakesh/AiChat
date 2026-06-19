@@ -11,7 +11,7 @@ struct HighlightButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .overlay {
-                configuration.isPressed ? Color.accent.opacity(0.4) : Color.accent.opacity(0)
+                configuration.isPressed ? Color.accent.opacity(0.9) : Color.accent.opacity(0)
             }
             .animation(.smooth, value: configuration.isPressed)
     }

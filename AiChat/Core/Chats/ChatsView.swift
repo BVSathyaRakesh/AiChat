@@ -14,18 +14,29 @@ struct ChatsView: View {
     var body: some View {
         NavigationStack {
             List {
-                ForEach(chats) { chat in
-                    HStack {
-                        ImageLoaderView(urlString: Constants.randomImage)
-                            .aspectRatio(1, contentMode: .fit)
-                            .frame(height: 70)
-                        VStack {
-                            Text(chat.id)
+                ForEach(chats, id: \.self) { chat in
+                    ChatRowCellViewBuilder(
+                        currentUserId: nil,
+                        chat: chat,
+                        getAvatar: {
+                            try? await Task.sleep(for: .seconds(3))
+                            return .mock
+                        },
+                        getLastMessage: {
+                            try? await Task.sleep(for: .seconds(3))
+                            return.mock
                         }
+                    )
+                    .anyButton(.highlight) {
+                        
                     }
                 }
             }
+            .removeListRowFormatting()
             .navigationTitle("Chats")
+            .onAppear {
+                UIScrollView.appearance().delaysContentTouches = false
+            }
         }
     }
 }

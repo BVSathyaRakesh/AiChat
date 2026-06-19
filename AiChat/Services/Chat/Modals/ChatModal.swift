@@ -7,23 +7,25 @@
 
 import Foundation
 
-struct ChatModal: Identifiable {
+struct ChatModal: Identifiable, Hashable {
     let id: String
     let userId: String
     let avatarId: String
     let dateCreated: Date
-    
+    let hasCreatedNew: Bool
     
     init(
         id: String,
         userId: String,
         avatarId: String,
-        dateCreated: Date
+        dateCreated: Date,
+        hasCreatedNew: Bool = false
     ) {
         self.id = id
         self.userId = userId
         self.avatarId = avatarId
         self.dateCreated = dateCreated
+        self.hasCreatedNew = hasCreatedNew
     }
 
     var timeAgo: String {
@@ -35,10 +37,10 @@ struct ChatModal: Identifiable {
     }
 
     static var mocks: [ChatModal] = [
-        ChatModal(id: "mock-chat_1", userId: UUID().uuidString, avatarId: UUID().uuidString, dateCreated: Date().addingTimeInterval(-60 * 30)),
-        ChatModal(id: "mock-chat_2", userId: UUID().uuidString, avatarId: UUID().uuidString, dateCreated: Date().addingTimeInterval(-3600 * 5)),
-        ChatModal(id: "mock-chat_3", userId: UUID().uuidString, avatarId: UUID().uuidString, dateCreated: Date().addingTimeInterval(-86400 * 2)),
-        ChatModal(id: "mock-chat_4", userId: UUID().uuidString, avatarId: UUID().uuidString, dateCreated: Date().addingTimeInterval(-86400 * 5)),
-        ChatModal(id: "mock-chat_5", userId: UUID().uuidString, avatarId: UUID().uuidString, dateCreated: Date().addingTimeInterval(-86400 * 10))
+        ChatModal(id: "mock-chat_1", userId: UUID().uuidString, avatarId: UUID().uuidString, dateCreated: Date().addingTimeInterval(-60 * 30), hasCreatedNew: false),
+        ChatModal(id: "mock-chat_2", userId: UUID().uuidString, avatarId: UUID().uuidString, dateCreated: Date().addingTimeInterval(-3600 * 5), hasCreatedNew: false),
+        ChatModal(id: "mock-chat_3", userId: UUID().uuidString, avatarId: UUID().uuidString, dateCreated: Date().addingTimeInterval(-86400 * 2), hasCreatedNew: true),
+        ChatModal(id: "mock-chat_4", userId: UUID().uuidString, avatarId: UUID().uuidString, dateCreated: Date().addingTimeInterval(-86400 * 5), hasCreatedNew: false),
+        ChatModal(id: "mock-chat_5", userId: UUID().uuidString, avatarId: UUID().uuidString, dateCreated: Date().addingTimeInterval(-86400 * 10), hasCreatedNew: false)
     ]
 }

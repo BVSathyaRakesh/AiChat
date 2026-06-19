@@ -12,7 +12,7 @@ struct CustomListsCellView: View {
     var title: String? = "Alien"
     var subtitle: String? = "An Alien that walks in the park"
     var imageName: String? = Constants.randomImage
-    
+   
     var body: some View {
         HStack(spacing: 8) {
             

@@ -12,7 +12,7 @@ struct ChatMessageModal: Identifiable {
     let chatId: String
     let authorId: String?
     let content: String?
-    let seenByIds: [String]
+    let seenByIds: [String]?
     let dateCreated: Date
 
     var timeAgo: String {
@@ -22,6 +22,11 @@ struct ChatMessageModal: Identifiable {
     var isFromCurrentUser: Bool {
         // This would typically check against actual current user ID
         authorId == "current-user-id"
+    }
+    
+    func hasSeenBy(userId: String) -> Bool {
+        guard let seenByIds else { return false }
+        return seenByIds.contains(userId)
     }
 
     static var mock: ChatMessageModal {
