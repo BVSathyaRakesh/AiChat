@@ -44,7 +44,7 @@ struct ExploreView: View {
                         subtitle: avatar.charecterDescription,
                         image: avatar.profileImageName
                     )
-                    .anyButton() {}
+                    .anyButton {}
                 }
             }
         } header: {

@@ -1,7 +1,12 @@
 {
   "permissions": {
     "allow": [
-      "Bash(xcodebuild -list)"
+      "Bash(xcodebuild -list)",
+      "Bash(swiftlint lint:*)",
+      "Bash(open:*)",
+      "Bash(ls -la *.xcodeproj)",
+      "Read(//Users/satkumar/Documents/Personal/SwiftUI/**)",
+      "Bash(xcodebuild -scheme AiChat -configuration Debug clean build -quiet)"
     ]
   }
 }

@@ -8,10 +8,24 @@
 import SwiftUI
 
 struct ChatsView: View {
+    
+    @State var chats: [ChatModal] = ChatModal.mocks
+    
     var body: some View {
         NavigationStack {
-            Text("Chats")
-                .navigationTitle("Chats")
+            List {
+                ForEach(chats) { chat in
+                    HStack {
+                        ImageLoaderView(urlString: Constants.randomImage)
+                            .aspectRatio(1, contentMode: .fit)
+                            .frame(height: 70)
+                        VStack {
+                            Text(chat.id)
+                        }
+                    }
+                }
+            }
+            .navigationTitle("Chats")
         }
     }
 }

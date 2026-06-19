@@ -25,7 +25,7 @@ struct CategoryCellView: View {
                 .font(.body)
                 .fontWeight(.semibold)
                 .padding(16)
-                .frame(maxWidth:.infinity, alignment: .leading)
+                .frame(maxWidth: .infinity, alignment: .leading)
                 .addingGradientBackgroundFortext()
                 
         }
