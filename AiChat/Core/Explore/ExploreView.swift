@@ -24,13 +24,14 @@ struct ExploreView: View {
                     .listRowSeparator(.hidden)
                     .listRowBackground(Color.clear)
                 popularSection
-                    
             }
             .listStyle(.plain)
             .scrollContentBackground(.hidden)
             .background(Color(uiColor: .systemGroupedBackground))
             .navigationTitle("Explore")
-            
+            .onAppear {
+                UIScrollView.appearance().delaysContentTouches = false
+            }
         }
     }
     
@@ -43,9 +44,7 @@ struct ExploreView: View {
                         subtitle: avatar.charecterDescription,
                         image: avatar.profileImageName
                     )
-                }
-                .anyButton(.highlight) {
-                    
+                    .anyButton() {}
                 }
             }
         } header: {
@@ -63,7 +62,7 @@ struct ExploreView: View {
                                 title: item.rawValue.capitalized,
                                 imageName: Constants.randomImage
                             )
-                            .anyButton(.highlight) {
+                            .anyButton {
                                 
                             }
                         }
@@ -83,26 +82,33 @@ struct ExploreView: View {
     private var popularSection: some View {
         Section {
             VStack(spacing: 0) {
-                ForEach(popularAvatars, id: \.self) { avatar in
+                ForEach(Array(popularAvatars.enumerated()), id: \.element) { index, avatar in
                     CustomListsCellView(
                         title: avatar.name,
                         subtitle: avatar.charecterDescription,
                         imageName: avatar.profileImageName
                     )
-                    .anyButton(.pressable) {
-                        
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .contentShape(Rectangle())
+                    .anyButton(.highlight) {
+
+                    }
+
+                    if index < popularAvatars.count - 1 {
+                        Divider()
+                            .padding(.leading, 84)
                     }
                  }
             }
-            .background(Color(uiColor: .systemBackground), alignment: .leading)
-            .clipShape(RoundedRectangle(cornerRadius: 16))
+            .background(Color(uiColor: .systemBackground))
+            .cornerRadius(16)
             .padding(.horizontal, 8)
         } header: {
             Text("Popular")
         }
         .listRowSeparator(.hidden)
         .listRowBackground(Color.clear)
-        
+
     }
 }
 

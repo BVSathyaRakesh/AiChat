@@ -28,7 +28,7 @@ struct CustomListsCellView: View {
               .frame(height: 60)
                .cornerRadius(16)
             
-            VStack(alignment: .leading) {
+            VStack(alignment: .leading, spacing: 4) {
                 if let title {
                     Text(title)
                         .font(.headline)
@@ -36,14 +36,13 @@ struct CustomListsCellView: View {
                 if let subtitle {
                     Text(subtitle)
                         .font(.subheadline)
+                        .foregroundStyle(.secondary)
                 }
-                Color(.lightGray).opacity(0.2)
-                    .frame(height: 1)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
         }
-        .padding(16)
-        .padding(.vertical,4)
+        .padding(.horizontal, 16)
+        .padding(.vertical, 12)
     }
 }
 
