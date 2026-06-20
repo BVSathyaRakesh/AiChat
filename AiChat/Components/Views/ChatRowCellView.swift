@@ -42,13 +42,7 @@ struct ChatRowCellView: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 if hasNewChat {
                         Text("NEW")
-                           .font(.caption)
-                           .bold()
-                           .foregroundColor(.white)
-                           .padding(.horizontal, 8)
-                           .padding(.vertical, 5)
-                           .background(Color.blue)
-                           .cornerRadius(6)
+                        .badgeButton()
                 }
             }
         }

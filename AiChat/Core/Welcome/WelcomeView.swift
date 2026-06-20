@@ -8,9 +8,10 @@
 import SwiftUI
 
 struct WelcomeView: View {
-    
+
     @State var imageName = Constants.randomImage
-    
+    @State private var showCreateAccountView: Bool = false
+
     var body: some View {
         VStack(spacing: 8) {
             ImageLoaderView(urlString: imageName)
@@ -20,6 +21,13 @@ struct WelcomeView: View {
             ctaButtons
                 .padding(16)
             policyLinks
+        }
+        .sheet(isPresented: $showCreateAccountView) {
+            CreateAccountView(
+                title: "Welcome Back!",
+                subtitle: "Connect to an existing account."
+            )
+            .presentationDetents([.medium])
         }
     }
     
@@ -49,7 +57,7 @@ struct WelcomeView: View {
                 .padding(8)
                 .tappableBackground()
                 .onTapGesture {
-                    
+                    showCreateAccountView.toggle()
                 }
         }
     }
