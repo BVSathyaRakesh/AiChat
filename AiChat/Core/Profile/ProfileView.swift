@@ -38,7 +38,7 @@ struct ProfileView: View {
            SettingsView()
         }
         .fullScreenCover(isPresented: $createNewAvatarView) {
-            Text("Create New Avatar View")
+            CreateAvatarView()
         }
     }
     
