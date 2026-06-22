@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+
 struct AnyAppAlert {
     var title: String
     var subtitle: String?
@@ -33,5 +34,36 @@ struct AnyAppAlert {
             subtitle: error.localizedDescription,
             showButtons: nil
         )
+    }
+}
+
+enum AlertType {
+    case alert, confirmationDialog
+}
+
+extension View {
+
+    @ViewBuilder
+    func showCustomAlert(type: AlertType = .alert, alert: Binding<AnyAppAlert?>) -> some View {
+        switch type {
+        case .alert:
+            self
+                .alert(alert.wrappedValue?.title ?? "", isPresented: Binding(ifNotNil: alert)) {
+                    alert.wrappedValue?.showButtons()
+                } message: {
+                    if let subtitle = alert.wrappedValue?.subtitle {
+                        Text(subtitle)
+                    }
+                }
+        case .confirmationDialog:
+            self
+                .confirmationDialog(alert.wrappedValue?.title ?? "", isPresented: Binding(ifNotNil: alert)) {
+                    alert.wrappedValue?.showButtons()
+                } message: {
+                    if let subtitle = alert.wrappedValue?.subtitle {
+                        Text(subtitle)
+                    }
+                }
+        }
     }
 }

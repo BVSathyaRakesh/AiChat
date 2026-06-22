@@ -7,28 +7,15 @@
 
 import SwiftUI
 
-extension View {
-    func showCustomAlert(alert: Binding<AnyAppAlert?>) -> some View {
-        self
-            .alert(alert.wrappedValue?.title ?? "", isPresented: Binding(ifNotNil: alert), actions: {
-                alert.wrappedValue?.showButtons()
-            }, message: {
-                if let subtitle = alert.wrappedValue?.subtitle {
-                    Text(subtitle)
-                }
-            })
-    }
-}
-
 struct ChatDetailsView: View {
     
     @State private var chatMessages: [ChatMessageModal] = ChatMessageModal.mocks
     @State private var avatarmodel: AvatarModal? = AvatarModal.mock
     @State private var textFieldText: String = ""
-    @State private var showChatSettings: Bool = false
     @State private var scrollPosition: String?
     @State private var showAlert: AnyAppAlert?
-    
+    @State private var showConfirmation: AnyAppAlert?
+   
     var body: some View {
         VStack(spacing: 0) {
             scrollViewSection
@@ -44,32 +31,12 @@ struct ChatDetailsView: View {
                 Image(systemName: "ellipsis")
                     .padding(8)
                     .anyButton {
-                        showChatSettings.toggle()
+                        showConfirmationDialog()
                     }
             }
         }
         .showCustomAlert(alert: $showAlert)
-        .sheet(isPresented: $showChatSettings) {
-            VStack(spacing: 20) {
-                Text("What would you like to do")
-                    .font(.headline)
-                    .padding(.top)
-                sheetButton(title: "Report User / Chat", role: .destructive) {
-                    showChatSettings = false
-                }
-
-                sheetButton(title: "Delete Chat", role: .destructive) {
-                    showChatSettings = false
-                }
-
-                sheetButton(title: "Cancel", role: .destructive) {
-                    showChatSettings = false
-                }
-            }
-            .padding()
-            .presentationDetents([.height(300)])
-            .presentationDragIndicator(.visible)
-        }
+        .showCustomAlert(type: .confirmationDialog, alert: $showConfirmation)
     }
     
     private var scrollViewSection: some View {
@@ -122,18 +89,6 @@ struct ChatDetailsView: View {
             .background(Color(uiColor: .secondarySystemBackground))
     }
 
-    private func sheetButton(title: String, role: ButtonRole?, action: @escaping () -> Void) -> some View {
-        Button(role: role) {
-            action()
-        } label: {
-            Text(title)
-                .frame(maxWidth: .infinity)
-                .padding()
-                .background(role == .destructive ? Color.red.opacity(0.1) : Color.gray.opacity(0.1))
-                .cornerRadius(10)
-        }
-    }
-    
     private func sendMessage() {
         do {
             try TextValidationHelper.validateTextField(text: textFieldText)
@@ -153,6 +108,30 @@ struct ChatDetailsView: View {
         } catch {
             showAlert = AnyAppAlert(error: error)
         }
+    }
+    
+    private func showConfirmationDialog() {
+        showConfirmation = AnyAppAlert(
+            title: "",
+            subtitle: "What would you like to do",
+            showButtons: {
+                AnyView(
+                    VStack {
+                        Button("Report User / Chat", role: .destructive) {
+                            showConfirmation = nil
+                            // Handle report action
+                        }
+                        Button("Delete Chat", role: .destructive) {
+                            showConfirmation = nil
+                            // Handle delete action
+                        }
+                        Button("Cancel", role: .cancel) {
+                            showConfirmation = nil
+                        }
+                    }
+                )
+            }
+        )
     }
 }
 
