@@ -7,6 +7,19 @@
 
 import SwiftUI
 
+extension View {
+    func showCustomAlert(alert: Binding<AnyAppAlert?>) -> some View {
+        self
+            .alert(alert.wrappedValue?.title ?? "", isPresented: Binding(ifNotNil: alert), actions: {
+                alert.wrappedValue?.showButtons()
+            }, message: {
+                if let subtitle = alert.wrappedValue?.subtitle {
+                    Text(subtitle)
+                }
+            })
+    }
+}
+
 struct ChatDetailsView: View {
     
     @State private var chatMessages: [ChatMessageModal] = ChatMessageModal.mocks
@@ -14,6 +27,7 @@ struct ChatDetailsView: View {
     @State private var textFieldText: String = ""
     @State private var showChatSettings: Bool = false
     @State private var scrollPosition: String?
+    @State private var showAlert: AnyAppAlert?
     
     var body: some View {
         VStack(spacing: 0) {
@@ -34,12 +48,12 @@ struct ChatDetailsView: View {
                     }
             }
         }
+        .showCustomAlert(alert: $showAlert)
         .sheet(isPresented: $showChatSettings) {
             VStack(spacing: 20) {
                 Text("What would you like to do")
                     .font(.headline)
                     .padding(.top)
-
                 sheetButton(title: "Report User / Chat", role: .destructive) {
                     showChatSettings = false
                 }
@@ -47,7 +61,7 @@ struct ChatDetailsView: View {
                 sheetButton(title: "Delete Chat", role: .destructive) {
                     showChatSettings = false
                 }
-                
+
                 sheetButton(title: "Cancel", role: .destructive) {
                     showChatSettings = false
                 }
@@ -121,17 +135,24 @@ struct ChatDetailsView: View {
     }
     
     private func sendMessage() {
-        let message = ChatMessageModal(
-            id: UUID().uuidString,
-            chatId: UUID().uuidString,
-            authorId: "current-user-id",
-            content: textFieldText,
-            seenByIds: nil,
-            dateCreated: .now
-        )
-        chatMessages.append(message)
-        textFieldText = ""
-        scrollPosition = message.id
+        do {
+            try TextValidationHelper.validateTextField(text: textFieldText)
+            
+            let message = ChatMessageModal(
+                id: UUID().uuidString,
+                chatId: UUID().uuidString,
+                authorId: "current-user-id",
+                content: textFieldText,
+                seenByIds: nil,
+                dateCreated: .now
+            )
+            chatMessages.append(message)
+            textFieldText = ""
+            scrollPosition = message.id
+            
+        } catch {
+            showAlert = AnyAppAlert(error: error)
+        }
     }
 }
 

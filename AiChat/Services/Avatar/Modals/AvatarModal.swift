@@ -53,4 +53,3 @@ struct AvatarModal: Hashable {
         AvatarModal(avatarId: UUID().uuidString, name: "Alpha1", charcterOption: .man, charcterAction: .relaxing, charcetrLocation: .mall, profileImageName: Constants.randomImage, authorId: UUID().uuidString, dateCreated: .now)
     ]
 }
-
