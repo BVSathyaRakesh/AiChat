@@ -77,16 +77,6 @@ struct ChatMessageModal: Identifiable {
             seenByIds: ["avatar-2"],
             dateCreated: Date().addingTimeInterval(-3600 * 4.5)
         ),
-
-        // Chat 3 - Yesterday
-        ChatMessageModal(
-            id: UUID().uuidString,
-            chatId: "chat-3",
-            authorId: "current-user-id",
-            content: "Can you help me with something?",
-            seenByIds: ["avatar-3"],
-            dateCreated: Date().addingTimeInterval(-86400 * 2)
-        ),
         ChatMessageModal(
             id: UUID().uuidString,
             chatId: "chat-3",
@@ -102,42 +92,6 @@ struct ChatMessageModal: Identifiable {
             content: "I'm trying to understand how this works.",
             seenByIds: [],
             dateCreated: Date().addingTimeInterval(-86400 * 1.8)
-        ),
-
-        // Chat 4 - Several days ago
-        ChatMessageModal(
-            id: UUID().uuidString,
-            chatId: "chat-4",
-            authorId: "avatar-4",
-            content: "Hey there! Long time no chat!",
-            seenByIds: ["current-user-id"],
-            dateCreated: Date().addingTimeInterval(-86400 * 5)
-        ),
-        ChatMessageModal(
-            id: UUID().uuidString,
-            chatId: "chat-4",
-            authorId: "current-user-id",
-            content: "Hi! Yeah, it's been a while. How have you been?",
-            seenByIds: ["avatar-4"],
-            dateCreated: Date().addingTimeInterval(-86400 * 4.9)
-        ),
-
-        // Chat 5 - Over a week ago
-        ChatMessageModal(
-            id: UUID().uuidString,
-            chatId: "chat-5",
-            authorId: "current-user-id",
-            content: "Thanks for all your help!",
-            seenByIds: ["avatar-5"],
-            dateCreated: Date().addingTimeInterval(-86400 * 10)
-        ),
-        ChatMessageModal(
-            id: UUID().uuidString,
-            chatId: "chat-5",
-            authorId: "avatar-5",
-            content: "You're very welcome! Feel free to reach out anytime.",
-            seenByIds: [],
-            dateCreated: Date().addingTimeInterval(-86400 * 9.9)
         )
     ]
 }
