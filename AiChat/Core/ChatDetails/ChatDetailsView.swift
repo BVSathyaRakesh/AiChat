@@ -35,12 +35,12 @@ struct ChatDetailsView: View {
                     .anyButton {
                         showConfirmationDialog()
                     }
+                    .showCustomAlert(type: .confirmationDialog, alert: $showConfirmation)
                     .disabled(showProfileModal)
             }
         }
         .navigationBarBackButtonHidden(showProfileModal)
         .showCustomAlert(alert: $showAlert)
-        .showCustomAlert(type: .confirmationDialog, alert: $showConfirmation)
         .customModal(isPresented: $showProfileModal) {
             if let avatarmodel {
                 ProfileModalview(
