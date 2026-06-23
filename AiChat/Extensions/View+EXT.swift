@@ -50,4 +50,40 @@ extension View {
             )
         }
     }
+
+    @ViewBuilder
+    func `if`<Content: View>(_ condition: Bool, transform: (Self) -> Content) -> some View {
+        if condition {
+            transform(self)
+        } else {
+            self
+        }
+    }
+
+    func customModal<Content: View>(
+        isPresented: Binding<Bool>,
+        overlayColor: Color = .black,
+        overlayOpacity: Double = 0.6,
+        contentPadding: CGFloat = 40,
+        transition: AnyTransition = .slide,
+        animation: Animation = .bouncy,
+        onDismiss: (() -> Void)? = nil,
+        @ViewBuilder content: @escaping () -> Content
+    ) -> some View {
+        ZStack {
+            self
+                .disabled(isPresented.wrappedValue)
+
+            CustomModalView(
+                isPresented: isPresented,
+                overlayColor: overlayColor,
+                overlayOpacity: overlayOpacity,
+                contentPadding: contentPadding,
+                transition: transition,
+                animation: animation,
+                onDismiss: onDismiss,
+                content: content
+            )
+        }
+    }
 }

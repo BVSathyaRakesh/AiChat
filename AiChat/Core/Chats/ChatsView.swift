@@ -8,9 +8,10 @@
 import SwiftUI
 
 struct ChatsView: View {
-    
+
     @State var chats: [ChatModal] = ChatModal.mocks
-    
+    @State private var selectedChat: ChatModal?
+
     var body: some View {
         NavigationStack {
             List {
@@ -28,12 +29,15 @@ struct ChatsView: View {
                         }
                     )
                     .anyButton(.highlight) {
-                        
+                        selectedChat = chat
                     }
                 }
             }
             .removeListRowFormatting()
             .navigationTitle("Chats")
+            .navigationDestination(item: $selectedChat) { _ in
+                ChatDetailsView()
+            }
             .onAppear {
                 UIScrollView.appearance().delaysContentTouches = false
             }

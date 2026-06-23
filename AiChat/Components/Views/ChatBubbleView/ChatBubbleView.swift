@@ -16,6 +16,8 @@ struct ChatBubbleView: View {
     var imageName: String? = Constants.randomImage
     let offset: CGFloat = 14
     
+    var action: (() -> Void)?
+    
     var body: some View {
         HStack {
             if showImage {
@@ -23,6 +25,9 @@ struct ChatBubbleView: View {
                     if let imageName {
                         ImageLoaderView(urlString: imageName)
                             .aspectRatio(contentMode: .fit)
+                            .anyButton {
+                                action?()
+                            }
                     } else {
                         Circle()
                             .fill(.gray)

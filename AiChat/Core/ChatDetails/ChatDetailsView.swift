@@ -15,6 +15,7 @@ struct ChatDetailsView: View {
     @State private var scrollPosition: String?
     @State private var showAlert: AnyAppAlert?
     @State private var showConfirmation: AnyAppAlert?
+    @State private var showProfileModal: Bool = false
    
     var body: some View {
         VStack(spacing: 0) {
@@ -33,10 +34,23 @@ struct ChatDetailsView: View {
                     .anyButton {
                         showConfirmationDialog()
                     }
+                    .disabled(showProfileModal)
             }
         }
+        .navigationBarBackButtonHidden(showProfileModal)
         .showCustomAlert(alert: $showAlert)
         .showCustomAlert(type: .confirmationDialog, alert: $showConfirmation)
+        .customModal(isPresented: $showProfileModal) {
+            if let avatarmodel {
+                ProfileModalview(
+                    imageName: avatarmodel.profileImageName,
+                    title: avatarmodel.name,
+                    subtitle: avatarmodel.charcterOption?.rawValue.capitalized,
+                    headline: avatarmodel.charecterDescription,
+                    onMarkPressed: { showProfileModal = false }
+                )
+            }
+        }
     }
     
     private var scrollViewSection: some View {
@@ -46,7 +60,8 @@ struct ChatDetailsView: View {
                     ChatBubbleViewBuilder(
                         message: message,
                         isCurrentuser: message.isFromCurrentUser,
-                        imageName: message.isFromCurrentUser ? nil : avatarmodel?.profileImageName
+                        imageName: message.isFromCurrentUser ? nil : avatarmodel?.profileImageName,
+                        action: showProfileModalScreen
                     )
                     .id(message.id)
                  }
@@ -132,6 +147,14 @@ struct ChatDetailsView: View {
                 )
             }
         )
+    }
+    
+    private func showProfileModalScreen() {
+        showProfileModal = true
+    }
+    
+    private func hideProfileModalScreen() {
+        showProfileModal = false
     }
 }
 
