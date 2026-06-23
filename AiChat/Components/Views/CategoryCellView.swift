@@ -11,7 +11,7 @@ struct CategoryCellView: View {
     
     var title: String?
     var imageName: String = Constants.randomImage
-    var font: Font = .title
+    var font: Font? = .title
     var cornerRadius: CGFloat = 16
     
     var body: some View {
@@ -22,7 +22,7 @@ struct CategoryCellView: View {
         .overlay(alignment: .bottomLeading) {
            textContainer
                 .foregroundStyle(.white)
-                .font(.body)
+                .font(font)
                 .fontWeight(.semibold)
                 .padding(16)
                 .frame(maxWidth: .infinity, alignment: .leading)
