@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		8AB854CF2FE16B7500B3391F /* SDWebImageSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 8AB854CE2FE16B7500B3391F /* SDWebImageSwiftUI */; };
 		8AB857282FE6E77D00B3391F /* SwiftfulUtilities in Frameworks */ = {isa = PBXBuildFile; productRef = 8AB857272FE6E77D00B3391F /* SwiftfulUtilities */; };
+		8AB858842FEACC2700B3391F /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 8AB858832FEACC2700B3391F /* FirebaseAuth */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -58,6 +59,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				8AB854CF2FE16B7500B3391F /* SDWebImageSwiftUI in Frameworks */,
+				8AB858842FEACC2700B3391F /* FirebaseAuth in Frameworks */,
 				8AB857282FE6E77D00B3391F /* SwiftfulUtilities in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -122,6 +124,7 @@
 			packageProductDependencies = (
 				8AB854CE2FE16B7500B3391F /* SDWebImageSwiftUI */,
 				8AB857272FE6E77D00B3391F /* SwiftfulUtilities */,
+				8AB858832FEACC2700B3391F /* FirebaseAuth */,
 			);
 			productName = AiChat;
 			productReference = 8AB853AC2FDF09B400B3391F /* AiChat.app */;
@@ -208,6 +211,7 @@
 			packageReferences = (
 				8AB854CD2FE16B7500B3391F /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */,
 				8AB857262FE6E77D00B3391F /* XCRemoteSwiftPackageReference "SwiftfulUtilities" */,
+				8AB858822FEACC2700B3391F /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 8AB853AD2FDF09B400B3391F /* Products */;
@@ -431,9 +435,9 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 5RZP9663S4;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -450,8 +454,9 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.personal.AiChat;
+				PRODUCT_BUNDLE_IDENTIFIER = com.diligent.AIChat;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = YES;
@@ -471,9 +476,9 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 5RZP9663S4;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -490,8 +495,9 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.personal.AiChat;
+				PRODUCT_BUNDLE_IDENTIFIER = com.diligent.AIChat;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = YES;
@@ -648,6 +654,14 @@
 				minimumVersion = 1.1.8;
 			};
 		};
+		8AB858822FEACC2700B3391F /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 12.15.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -660,6 +674,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 8AB857262FE6E77D00B3391F /* XCRemoteSwiftPackageReference "SwiftfulUtilities" */;
 			productName = SwiftfulUtilities;
+		};
+		8AB858832FEACC2700B3391F /* FirebaseAuth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8AB858822FEACC2700B3391F /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAuth;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

@@ -66,3 +66,8 @@ AiChat/
 ## Dependencies
 
 - **SDWebImageSwiftUI** (3.1.4): Async image loading with caching
+- **Firebase**: Backend services (config file not tracked in git)
+
+## Configuration
+
+**Firebase Setup:** See `FIREBASE_SETUP.md` for instructions on adding your Firebase configuration file.
