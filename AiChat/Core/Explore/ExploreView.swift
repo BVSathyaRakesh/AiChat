@@ -13,9 +13,10 @@ struct ExploreView: View {
     @State var featuredAvatars: [AvatarModal] = AvatarModal.mocks
     @State var catergories: [CharecterOption] = CharecterOption.allCases
     @State var popularAvatars: [AvatarModal] = AvatarModal.mocks
+    @State var path: [NavigationPathOption] = []
     
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $path) {
             List {
                 featuredSection
                     .listRowSeparator(.hidden)
@@ -32,6 +33,8 @@ struct ExploreView: View {
             .onAppear {
                 UIScrollView.appearance().delaysContentTouches = false
             }
+            .navigationDestinationForModule(path: $path)
+
         }
     }
     
@@ -44,7 +47,9 @@ struct ExploreView: View {
                         subtitle: avatar.charecterDescription,
                         image: avatar.profileImageName
                     )
-                    .anyButton {}
+                    .anyButton {
+                        onCategoryPressed(category: avatar.charcterOption ?? .alien, imageName: avatar.profileImageName ?? Constants.randomImage)
+                    }
                 }
             }
         } header: {
@@ -58,12 +63,15 @@ struct ExploreView: View {
                 ScrollView(.horizontal) {
                     HStack {
                         ForEach(catergories, id: \.self) { item in
-                            CategoryCellView(
-                                title: item.rawValue.capitalized,
-                                imageName: Constants.randomImage
-                            )
-                            .anyButton {
-                                
+                            let imageName = popularAvatars.first(where: { $0.charcterOption == item})?.profileImageName
+                            if let imageName {
+                                CategoryCellView(
+                                    title: item.rawValue.capitalized,
+                                    imageName: imageName
+                                )
+                                .anyButton {
+                                    onCategoryPressed(category: item, imageName: imageName)
+                                }
                             }
                         }
                     }
@@ -91,9 +99,8 @@ struct ExploreView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .contentShape(Rectangle())
                     .anyButton(.highlight) {
-
+                        onAVatarPressed(avatar: avatar)
                     }
-
                     if index < popularAvatars.count - 1 {
                         Divider()
                             .padding(.leading, 84)
@@ -108,7 +115,14 @@ struct ExploreView: View {
         }
         .listRowSeparator(.hidden)
         .listRowBackground(Color.clear)
-
+    }
+    
+    private func onAVatarPressed(avatar: AvatarModal) {
+        path.append(.chat(avatarId: avatar.avatarId))
+    }
+    
+    private func onCategoryPressed(category: CharecterOption, imageName: String) {
+        path.append(.category(category: category, imageName: imageName))
     }
 }
 

@@ -6,7 +6,9 @@
       "Bash(open:*)",
       "Bash(ls -la *.xcodeproj)",
       "Read(//Users/satkumar/Documents/Personal/SwiftUI/**)",
-      "Bash(xcodebuild -scheme AiChat -configuration Debug clean build -quiet)"
+      "Bash(xcodebuild -scheme AiChat -configuration Debug clean build -quiet)",
+      "Bash(swiftlint version:*)",
+      "Bash(xcodebuild -scheme AiChat -configuration Debug clean build)"
     ]
   }
 }

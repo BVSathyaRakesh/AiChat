@@ -14,14 +14,16 @@ struct ProfileView: View {
     @State private var createNewAvatarView: Bool = false
     @State private var myAVatars: [AvatarModal] = []
     @State private var isLoading: Bool = true
+    @State var path: [NavigationPathOption] = []
   
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $path) {
             List {
                 userProfileSection
                 myAvatarSection
             }
             .navigationTitle("Profile")
+            .navigationDestinationForModule(path: $path)
             .task {
                 await loadData()
             }
@@ -33,6 +35,7 @@ struct ProfileView: View {
                     profileButton
                 }
             }
+            
         }
         .sheet(isPresented: $showSettings) {
            SettingsView()
@@ -79,7 +82,7 @@ struct ProfileView: View {
                         imageName: avatar.profileImageName
                     )
                     .anyButton(.highlight, action: {
-                        
+                        path.append(.chat(avatarId: avatar.avatarId))
                     })
                     .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
                 }

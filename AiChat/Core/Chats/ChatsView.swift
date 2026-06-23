@@ -11,33 +11,32 @@ struct ChatsView: View {
 
     @State var chats: [ChatModal] = ChatModal.mocks
     @State private var selectedChat: ChatModal?
+    @State var path: [NavigationPathOption] = []
 
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $path) {
             List {
                 ForEach(chats, id: \.self) { chat in
                     ChatRowCellViewBuilder(
                         currentUserId: nil,
                         chat: chat,
                         getAvatar: {
-                            try? await Task.sleep(for: .seconds(3))
-                            return .mock
+                            try? await Task.sleep(for: .seconds(1))
+                            return AvatarModal.mocks.randomElement()!
                         },
                         getLastMessage: {
-                            try? await Task.sleep(for: .seconds(3))
-                            return.mock
+                            try? await Task.sleep(for: .seconds(1))
+                            return ChatMessageModal.mocks.randomElement()!
                         }
                     )
                     .anyButton(.highlight) {
-                        selectedChat = chat
+                        path.append(.chat(avatarId: chat.avatarId))
                     }
                 }
             }
             .removeListRowFormatting()
+            .navigationDestinationForModule(path: $path)
             .navigationTitle("Chats")
-            .navigationDestination(item: $selectedChat) { _ in
-                ChatDetailsView()
-            }
             .onAppear {
                 UIScrollView.appearance().delaysContentTouches = false
             }
