@@ -21,9 +21,9 @@ struct AnyAppAlert {
         self.subtitle = subtitle
         self.showButtons = showButtons ?? {
             AnyView(
-                    Button("OK") {
-                        
-                    }
+                Button("OK") {
+                    
+                }
             )
         }
     }
@@ -42,7 +42,7 @@ enum AlertType {
 }
 
 extension View {
-
+    
     @ViewBuilder
     func showCustomAlert(type: AlertType = .alert, alert: Binding<AnyAppAlert?>) -> some View {
         switch type {
