@@ -7,54 +7,124 @@
 
 import FirebaseAuth
 import SwiftUI
+import SignInAppleAsync
 
 extension EnvironmentValues {
     @Entry var authService: FirebaseAuthService = FirebaseAuthService()
 }
 
-struct UserAuthInfo: Sendable {
-    let uid: String
-    let email: String?
-    let isAonymous: Bool?
-    let creationDate: Date?
-    let lastSignInDate: Date?
-    
-    init(
-        uid: String,
-        email: String? = nil,
-        isAonymous: Bool? = false,
-        creationDate: Date? = nil,
-        lastSignInDate: Date? = nil
-    ) {
-        self.uid = uid
-        self.email = email
-        self.isAonymous = isAonymous
-        self.creationDate = creationDate
-        self.lastSignInDate = lastSignInDate
-    }
-    
-    init(user: User){
-        self.uid = user.uid
-        self.email = user.email
-        self.isAonymous = user.isAnonymous
-        self.creationDate = user.metadata.creationDate
-        self.lastSignInDate = user.metadata.lastSignInDate
+enum AuthError: LocalizedError {
+    case userNotFound
+    var errorDescription: String? {
+        switch self {
+        case .userNotFound:
+            return "Currenthenticated User Not Found"
+        }
     }
 }
 
 struct FirebaseAuthService {
-    
+
     func getAuthenticatedUser() -> UserAuthInfo? {
-        if let user = Auth.auth().currentUser{
+        if let user = Auth.auth().currentUser {
             return UserAuthInfo(user: user)
         }
         return nil
     }
+
+    func getAuthenticatedUserRefreshed() async throws -> UserAuthInfo? {
+        guard let user = Auth.auth().currentUser else {
+            return nil
+        }
+        try await user.reload()
+        guard let refreshedUser = Auth.auth().currentUser else {
+            return nil
+        }
+        return UserAuthInfo(user: refreshedUser)
+    }
     
     func signInAnonymously() async throws -> (user: UserAuthInfo, isNewuser: Bool) {
         let result = try await Auth.auth().signInAnonymously()
-        let user = UserAuthInfo(user: result.user)
-        let isNewuser = result.additionalUserInfo?.isNewUser ?? true
+        return result.asAuthInfo
+    }
+    
+    func signInApple() async throws -> (user: UserAuthInfo, isNewuser: Bool) {
+        let helper =  SignInWithAppleHelper()
+        let response = try await helper.signIn()
+        let credential = OAuthProvider.credential(
+            providerID: AuthProviderID.apple,
+            idToken: response.token,
+            rawNonce: response.nonce
+        )
+
+        if let user = Auth.auth().currentUser, user.isAnonymous {
+            do {
+                let result = try await user.link(with: credential)
+                try await result.user.reload()
+                let refreshedUser = Auth.auth().currentUser!
+                return (UserAuthInfo(user: refreshedUser), result.additionalUserInfo?.isNewUser ?? false)
+            } catch {
+                let nsError = error as NSError
+                if nsError.code == 17025 {
+                    if let secondaryCredential = nsError.userInfo["FIRAuthErrorUserInfoUpdatedCredentialKey"] as? AuthCredential {
+                        let result = try await Auth.auth().signIn(with: secondaryCredential)
+                        return result.asAuthInfo
+                    }
+                }
+                throw error
+            }
+        }
+
+        let result = try await Auth.auth().signIn(with: credential)
+        return result.asAuthInfo
+    }
+
+    func signInGoogle() async throws -> (user: UserAuthInfo, isNewuser: Bool) {
+        let helper = SignInWithGoogleHelper()
+        let response = try await helper.signIn()
+        let credential = GoogleAuthProvider.credential(
+            withIDToken: response.idToken,
+            accessToken: response.accessToken
+        )
+
+        if let user = Auth.auth().currentUser, user.isAnonymous {
+            do {
+                let result = try await user.link(with: credential)
+                try await result.user.reload()
+                let refreshedUser = Auth.auth().currentUser!
+                return (UserAuthInfo(user: refreshedUser), result.additionalUserInfo?.isNewUser ?? false)
+            } catch {
+                let nsError = error as NSError
+                if nsError.code == 17025 {
+                    if let secondaryCredential = nsError.userInfo["FIRAuthErrorUserInfoUpdatedCredentialKey"] as? AuthCredential {
+                        let result = try await Auth.auth().signIn(with: secondaryCredential)
+                        return result.asAuthInfo
+                    }
+                }
+                throw error
+            }
+        }
+
+        let result = try await Auth.auth().signIn(with: credential)
+        return result.asAuthInfo
+    }
+
+    func signout() throws {
+        try Auth.auth().signOut()
+    }
+    
+    func deleteAccount() async throws {
+        guard let user = Auth.auth().currentUser else {
+            throw AuthError.userNotFound
+        }
+        try await user.delete()
+    }
+}
+
+extension AuthDataResult {
+    var asAuthInfo: (user: UserAuthInfo, isNewuser: Bool) {
+        let user = UserAuthInfo(user: user)
+        let isNewuser = additionalUserInfo?.isNewUser ?? true
         return (user, isNewuser)
     }
 }

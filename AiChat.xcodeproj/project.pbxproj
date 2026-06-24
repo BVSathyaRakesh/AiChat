@@ -10,6 +10,9 @@
 		8AB854CF2FE16B7500B3391F /* SDWebImageSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 8AB854CE2FE16B7500B3391F /* SDWebImageSwiftUI */; };
 		8AB857282FE6E77D00B3391F /* SwiftfulUtilities in Frameworks */ = {isa = PBXBuildFile; productRef = 8AB857272FE6E77D00B3391F /* SwiftfulUtilities */; };
 		8AB858842FEACC2700B3391F /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 8AB858832FEACC2700B3391F /* FirebaseAuth */; };
+		8AE3882E2FEB942300E5A9DA /* SignInAppleAsync in Frameworks */ = {isa = PBXBuildFile; productRef = 8AE3882D2FEB942300E5A9DA /* SignInAppleAsync */; };
+		8AE388372FEBACBA00E5A9DA /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = 8AE388362FEBACBA00E5A9DA /* GoogleSignIn */; };
+		8AE388392FEBACBA00E5A9DA /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 8AE388382FEBACBA00E5A9DA /* GoogleSignInSwift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -35,9 +38,22 @@
 		8AB853C32FDF09B500B3391F /* AiChatUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AiChatUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		8AE3883B2FEBAEEC00E5A9DA /* Exceptions for "AiChat" folder in "AiChat" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 8AB853AB2FDF09B400B3391F /* AiChat */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		8AB853AE2FDF09B400B3391F /* AiChat */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				8AE3883B2FEBAEEC00E5A9DA /* Exceptions for "AiChat" folder in "AiChat" target */,
+			);
 			path = AiChat;
 			sourceTree = "<group>";
 		};
@@ -58,7 +74,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8AE388372FEBACBA00E5A9DA /* GoogleSignIn in Frameworks */,
+				8AE3882E2FEB942300E5A9DA /* SignInAppleAsync in Frameworks */,
 				8AB854CF2FE16B7500B3391F /* SDWebImageSwiftUI in Frameworks */,
+				8AE388392FEBACBA00E5A9DA /* GoogleSignInSwift in Frameworks */,
 				8AB858842FEACC2700B3391F /* FirebaseAuth in Frameworks */,
 				8AB857282FE6E77D00B3391F /* SwiftfulUtilities in Frameworks */,
 			);
@@ -125,6 +144,9 @@
 				8AB854CE2FE16B7500B3391F /* SDWebImageSwiftUI */,
 				8AB857272FE6E77D00B3391F /* SwiftfulUtilities */,
 				8AB858832FEACC2700B3391F /* FirebaseAuth */,
+				8AE3882D2FEB942300E5A9DA /* SignInAppleAsync */,
+				8AE388362FEBACBA00E5A9DA /* GoogleSignIn */,
+				8AE388382FEBACBA00E5A9DA /* GoogleSignInSwift */,
 			);
 			productName = AiChat;
 			productReference = 8AB853AC2FDF09B400B3391F /* AiChat.app */;
@@ -212,6 +234,8 @@
 				8AB854CD2FE16B7500B3391F /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */,
 				8AB857262FE6E77D00B3391F /* XCRemoteSwiftPackageReference "SwiftfulUtilities" */,
 				8AB858822FEACC2700B3391F /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+				8AE3882C2FEB942300E5A9DA /* XCRemoteSwiftPackageReference "SignInAppleAsync" */,
+				8AE388352FEBACBA00E5A9DA /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 8AB853AD2FDF09B400B3391F /* Products */;
@@ -435,12 +459,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = AiChat/AiChat.entitlements;
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = AiChat/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = AIChat;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -476,12 +502,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = AiChat/AiChat.entitlements;
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = AiChat/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = AIChat;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -662,6 +690,22 @@
 				minimumVersion = 12.15.0;
 			};
 		};
+		8AE3882C2FEB942300E5A9DA /* XCRemoteSwiftPackageReference "SignInAppleAsync" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SwiftfulThinking/SignInAppleAsync.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.2;
+			};
+		};
+		8AE388352FEBACBA00E5A9DA /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/google/GoogleSignIn-iOS";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 9.2.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -679,6 +723,21 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 8AB858822FEACC2700B3391F /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseAuth;
+		};
+		8AE3882D2FEB942300E5A9DA /* SignInAppleAsync */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8AE3882C2FEB942300E5A9DA /* XCRemoteSwiftPackageReference "SignInAppleAsync" */;
+			productName = SignInAppleAsync;
+		};
+		8AE388362FEBACBA00E5A9DA /* GoogleSignIn */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8AE388352FEBACBA00E5A9DA /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignIn;
+		};
+		8AE388382FEBACBA00E5A9DA /* GoogleSignInSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8AE388352FEBACBA00E5A9DA /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignInSwift;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

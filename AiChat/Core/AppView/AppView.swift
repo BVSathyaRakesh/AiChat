@@ -28,22 +28,25 @@ struct AppView: View {
         .task {
             await checkUserStatus()
         }
-        
+        .onChange(of: appState.showTabBar) { _, showTabBar in
+            if !showTabBar {
+                Task {
+                    await checkUserStatus()
+                }
+            }
+        }
     }
     
    private func checkUserStatus() async {
-       if let user = authService.getAuthenticatedUser() {
-           // User is authenticated
-           print("user is already  Authenticated: \(user.uid)")
-       } else {
+       if authService.getAuthenticatedUser() == nil {
            do {
-                // User is not authenticated
-               let result = try await authService.signInAnonymously()
-               print("user is signed in anonymously: \(result.user.uid)")
+               // User is not authenticated, sign in anonymously
+               try await authService.signInAnonymously()
            } catch {
                print(error)
            }
        }
+       // Don't change showTabBar here - respect persisted state from UserDefaults
     }
 }
 

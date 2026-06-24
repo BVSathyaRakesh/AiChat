@@ -10,7 +10,7 @@ import AuthenticationServices
 
 struct CreateAccountView: View {
     @Environment(\.dismiss) private var dismiss
-
+    @Environment(\.authService) private var authservice
     let title: String
     let subtitle: String
 
@@ -34,6 +34,11 @@ struct CreateAccountView: View {
                 onSignInWithApplePressed()
             }
 
+            SignInWithGoogleButtonView(cornerRadius: 16)
+                .anyButton(.pressable) {
+                    onSignInWithGooglePressed()
+                }
+
             Spacer()
         }
         .padding(24)
@@ -42,9 +47,25 @@ struct CreateAccountView: View {
     }
 
     private func onSignInWithApplePressed() {
-        // Handle Apple Sign In
-        print("Sign in with Apple pressed")
-        dismiss()
+        Task {
+            do {
+                try await authservice.signInApple()
+            } catch {
+                // Handle error silently or show alert
+            }
+            dismiss()
+        }
+    }
+
+    private func onSignInWithGooglePressed() {
+        Task {
+            do {
+                try await authservice.signInGoogle()
+            } catch {
+                // Handle error silently or show alert
+            }
+            dismiss()
+        }
     }
 }
 

@@ -10,10 +10,13 @@ import SwiftfulUtilities
 
 struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.authService) private var authService
     @Environment(AppState.self) private var appState
     @State private var isPremium: Bool = false
     @State private var isAnonymousUser: Bool = true
+    @State private var isUserSignedIn: Bool = false
     @State private var showCreateAccountView: Bool = false
+    @State private var showErrorAlert: AnyAppAlert?
     
     var body: some View {
         NavigationStack {
@@ -26,38 +29,59 @@ struct SettingsView: View {
         }
         .onAppear {
             UIScrollView.appearance().delaysContentTouches = false
+            Task {
+                await setAnonymousAccountStatus()
+            }
         }
-        .sheet(isPresented: $showCreateAccountView) {
-            CreateAccountView(
-                title: "Create Account?",
-                subtitle: "Don't lose your data! Connect to an SSO provider to save your account."
-            )
-            .presentationDetents([.medium])
-        }
+        .sheet(
+            isPresented: $showCreateAccountView,
+            onDismiss: {
+                // Refresh auth status when sheet dismisses (in case user signed in)
+                Task {
+                    await setAnonymousAccountStatus()
+                }
+            },
+            content: {
+                CreateAccountView(
+                    title: "Create Account?",
+                    subtitle: "Don't lose your data! Connect to an SSO provider to save your account."
+                )
+                .presentationDetents([.medium])
+            }
+        )
+        .showCustomAlert(type: .alert, alert: $showErrorAlert)
     }
     
     private var accountSection: some View {
         Section {
-            if isAnonymousUser {
-                Text("Save & back-up Account")
+            if isUserSignedIn {
+                if isAnonymousUser {
+                    Text("Save & back-up Account")
+                        .rowFormatting()
+                        .anyButton(.highlight) {
+                            onCreateAccountButtonPressed()
+                        }
+                } else {
+                    Text("Sign Out")
+                        .rowFormatting()
+                        .anyButton(.highlight) {
+                            onSignoutPressed()
+                        }
+                }
+
+                Text("Delete Account")
+                    .foregroundStyle(.red)
+                    .rowFormatting()
+                    .anyButton(.highlight) {
+                        onDeleteAccountPressed()
+                    }
+            } else {
+                Text("Sign In")
                     .rowFormatting()
                     .anyButton(.highlight) {
                         onCreateAccountButtonPressed()
                     }
-                    
-            } else {
-                Text("Sign Out")
-                    .rowFormatting()
-                    .anyButton(.highlight) {
-                        onSignoutPressed()
-                    }
             }
-            Text("Delete Account")
-                .foregroundStyle(.red)
-                .rowFormatting()
-                .anyButton(.highlight) {
-                    onSignoutPressed()
-                }
         } header: {
             Text("Account")
         }
@@ -117,11 +141,40 @@ struct SettingsView: View {
     }
     
     func onSignoutPressed() {
-        // do some logic to sign out the user
-        dismiss()
         Task {
-            try? await Task.sleep(for: .seconds(1))
-            appState.updateViewState(showTabBarView: false)
+            do {
+                try authService.signout()
+                await setAnonymousAccountStatus() // Refresh UI state
+                try? await Task.sleep(for: .seconds(1))
+                appState.updateViewState(showTabBarView: false)
+            } catch {
+                showErrorAlert = AnyAppAlert(error: AuthError.userNotFound)
+            }
+            dismiss()
+        }
+    }
+    
+    func onDeleteAccountPressed() {
+        showErrorAlert = AnyAppAlert(title: "Delete Account?", subtitle: "Are you sure you want to delete your Account? This action cannot be undone and Your data will be deleted from our server forever", showButtons: {
+            AnyView(
+                Button("Delete", role: .destructive) {
+                    onDeleteAccountConfirmationPressed()
+                }
+            )
+        })
+    }
+    
+    private func onDeleteAccountConfirmationPressed() {
+        Task {
+            do {
+                try await authService.deleteAccount()
+                await setAnonymousAccountStatus() // Refresh UI state
+                try? await Task.sleep(for: .seconds(1))
+                appState.updateViewState(showTabBarView: false)
+            } catch {
+                showErrorAlert = AnyAppAlert(error: AuthError.userNotFound)
+            }
+            dismiss()
         }
     }
     
@@ -129,6 +182,17 @@ struct SettingsView: View {
         showCreateAccountView.toggle()
     }
     
+    func setAnonymousAccountStatus() async {
+        do {
+            let user = try await authService.getAuthenticatedUserRefreshed()
+            isUserSignedIn = user != nil
+            isAnonymousUser = user?.isAonymous == true
+        } catch {
+            let user = authService.getAuthenticatedUser()
+            isUserSignedIn = user != nil
+            isAnonymousUser = user?.isAonymous == true
+        }
+    }
 }
 
 fileprivate extension View {
