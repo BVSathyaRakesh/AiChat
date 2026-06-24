@@ -41,7 +41,7 @@ struct AppView: View {
        if authService.getAuthenticatedUser() == nil {
            do {
                // User is not authenticated, sign in anonymously
-               try await authService.signInAnonymously()
+             _ =  try await authService.signInAnonymously()
            } catch {
                print(error)
            }

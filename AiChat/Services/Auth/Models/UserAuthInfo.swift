@@ -10,7 +10,7 @@ import FirebaseAuth
 struct UserAuthInfo: Sendable {
     let uid: String
     let email: String?
-    let isAonymous: Bool?
+    let isAnonymous: Bool?
     let creationDate: Date?
     let lastSignInDate: Date?
     
@@ -23,10 +23,18 @@ struct UserAuthInfo: Sendable {
     ) {
         self.uid = uid
         self.email = email
-        self.isAonymous = isAonymous
+        self.isAnonymous = isAonymous
         self.creationDate = creationDate
         self.lastSignInDate = lastSignInDate
     }
     
-   
+    static func mock(isAnonymous: Bool = false) -> Self {
+        UserAuthInfo(
+            uid: "mock-user1",
+            email: "hello@swiftful-thinking.com",
+            isAonymous: isAnonymous,
+            creationDate: .now,
+            lastSignInDate: .now
+        )
+    }
 }

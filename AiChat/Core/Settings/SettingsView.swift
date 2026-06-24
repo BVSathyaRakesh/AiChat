@@ -186,11 +186,11 @@ struct SettingsView: View {
         do {
             let user = try await authService.getAuthenticatedUserRefreshed()
             isUserSignedIn = user != nil
-            isAnonymousUser = user?.isAonymous == true
+            isAnonymousUser = user?.isAnonymous == true
         } catch {
             let user = authService.getAuthenticatedUser()
             isUserSignedIn = user != nil
-            isAnonymousUser = user?.isAonymous == true
+            isAnonymousUser = user?.isAnonymous == true
         }
     }
 }
@@ -205,7 +205,20 @@ fileprivate extension View {
     }
 }
 
-#Preview {
+#Preview("No Auth") {
     SettingsView()
+        .environment(\.authService, MockAuthService(user: nil))
+        .environment(AppState())
+}
+
+#Preview("SignIn Anonymously") {
+    SettingsView()
+        .environment(\.authService, MockAuthService(user: UserAuthInfo.mock(isAnonymous: true)))
+        .environment(AppState())
+}
+
+#Preview("SignIn with Google") {
+    SettingsView()
+        .environment(\.authService, MockAuthService(user: UserAuthInfo.mock(isAnonymous: false)))
         .environment(AppState())
 }

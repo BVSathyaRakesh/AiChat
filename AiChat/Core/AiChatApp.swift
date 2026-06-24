@@ -9,6 +9,28 @@ import SwiftUI
 import FirebaseCore
 import GoogleSignIn
 
+@main
+struct AiChatApp: App {
+
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
+
+    var body: some Scene {
+        WindowGroup {
+            EnvironmentViewBuilder {
+                AppView()
+            }
+        }
+    }
+}
+
+struct EnvironmentViewBuilder<Content: View>: View {
+    @ViewBuilder var content: () -> Content
+    var body: some View {
+        content()
+            .environment(\.authService, FirebaseAuthService())
+    }
+}
+
 class AppDelegate: NSObject, UIApplicationDelegate {
     func application(
         _ application: UIApplication,
@@ -31,17 +53,5 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         options: [UIApplication.OpenURLOptionsKey: Any] = [:]
     ) -> Bool {
         return GIDSignIn.sharedInstance.handle(url)
-    }
-}
-
-@main
-struct AiChatApp: App {
-
-    @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
-
-    var body: some Scene {
-        WindowGroup {
-            AppView()
-        }
     }
 }

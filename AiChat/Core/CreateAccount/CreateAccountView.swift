@@ -49,7 +49,7 @@ struct CreateAccountView: View {
     private func onSignInWithApplePressed() {
         Task {
             do {
-                try await authservice.signInApple()
+               _ = try await authservice.signInApple()
             } catch {
                 // Handle error silently or show alert
             }
@@ -60,7 +60,7 @@ struct CreateAccountView: View {
     private func onSignInWithGooglePressed() {
         Task {
             do {
-                try await authservice.signInGoogle()
+               _ = try await authservice.signInGoogle()
             } catch {
                 // Handle error silently or show alert
             }

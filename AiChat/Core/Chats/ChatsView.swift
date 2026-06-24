@@ -80,7 +80,7 @@ struct ChatsView: View {
                     .multilineTextAlignment(.center)
                     .frame(maxWidth: .infinity, alignment: .center)
                     .removeListRowFormatting()
-            }else {
+            } else {
                 ForEach(chats, id: \.self) { chat in
                     ChatRowCellViewBuilder(
                         currentUserId: nil,
