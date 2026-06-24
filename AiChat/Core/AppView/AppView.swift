@@ -9,7 +9,8 @@ import SwiftUI
 
 struct AppView: View {
     
-    @Environment(\.authService) private var authService
+    @Environment(AuthManager.self) private var authManager
+    @Environment(UserManager.self) private var userManager
     @State var appState: AppState = AppState()
     
     var body: some View {
@@ -37,16 +38,29 @@ struct AppView: View {
         }
     }
     
-   private func checkUserStatus() async {
-       if authService.getAuthenticatedUser() == nil {
-           do {
-               // User is not authenticated, sign in anonymously
-             _ =  try await authService.signInAnonymously()
-           } catch {
-               print(error)
-           }
-       }
-       // Don't change showTabBar here - respect persisted state from UserDefaults
+    private func checkUserStatus() async {
+        if let user = authManager.auth {
+            print("User is already signed in: \(user.uid)")
+            do {
+                // User is not authenticated, sign in anonymously
+                try  await userManager.login(auth: user, isNewUser: false)
+            } catch {
+                print("failed to login to existing user \(error)")
+                try? await Task.sleep(for: .seconds(5))
+                await checkUserStatus()
+            }
+        } else {
+            do {
+                let result =  try await authManager.signInAnonymously()
+                print("sign in anonymously success: \(result.user.uid)")
+                try await userManager.login(auth: result.user, isNewUser: result.isNewuser)
+            } catch {
+                print(error)
+                try? await Task.sleep(for: .seconds(5))
+               await checkUserStatus()
+            }
+        }
+        // Don't change showTabBar here - respect persisted state from UserDefaults
     }
 }
 

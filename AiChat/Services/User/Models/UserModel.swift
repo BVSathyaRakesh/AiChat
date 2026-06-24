@@ -8,11 +8,57 @@
 import Foundation
 import SwiftUI
 
-struct UserModel {
+struct UserModel: Codable {
     let userId: String
-    let dateCreated: Date?
+    let email: String?
+    let isAnonymous: Bool?
+    let creationDate: Date?
+    let creationVersion: String?
+    let lastSignInDate: Date?
     let didCompleteOnBoarding: Bool?
     let profileColorHex: String?
+    
+    init(
+        userId: String,
+        email: String? = nil,
+        isAnonymous: Bool? = nil,
+        creationDate: Date? = nil,
+        creationVersion: String? = nil,
+        lastSignInDate: Date? = nil,
+        didCompleteOnBoarding: Bool? = nil,
+        profileColorHex: String? = nil
+    ) {
+        self.userId = userId
+        self.email = email
+        self.isAnonymous = isAnonymous
+        self.creationDate = creationDate
+        self.creationVersion = creationVersion
+        self.lastSignInDate = lastSignInDate
+        self.didCompleteOnBoarding = didCompleteOnBoarding
+        self.profileColorHex = profileColorHex
+    }
+    
+    init(auth: UserAuthInfo, createionVersion: String? = nil) {
+        self.init(
+            userId: auth.uid,
+            email: auth.email,
+            isAnonymous: auth.isAnonymous,
+            creationDate: auth.creationDate,
+            creationVersion: createionVersion,
+            lastSignInDate: auth.lastSignInDate
+        )
+    }
+    
+    enum CodingKeys: String,CodingKey {
+        case userId = "user_id"
+        case email
+        case isAnonymous = "is_anonymous"
+        case creationDate = "creation_date"
+        case creationVersion = "creation_version"
+        case lastSignInDate = "last_sign_in_date"
+        case didCompleteOnBoarding = "did_complete_on_boarding"
+        case profileColorHex = "profile_color_hex"
+    }
 
     var profileColor: Color? {
         guard let hex = profileColorHex else { return .accent }
@@ -27,35 +73,35 @@ struct UserModel {
         // Current user - completed onboarding
         UserModel(
             userId: "current-user-id",
-            dateCreated: Date().addingTimeInterval(-86400 * 30),
+            creationDate: Date().addingTimeInterval(-86400 * 30),
             didCompleteOnBoarding: true,
             profileColorHex: "#4ECDC4"
         ),
         // New user - not completed onboarding
         UserModel(
             userId: UUID().uuidString,
-            dateCreated: Date().addingTimeInterval(-86400 * 1),
+            creationDate: Date().addingTimeInterval(-86400 * 1),
             didCompleteOnBoarding: false,
             profileColorHex: nil
         ),
         // Regular user - completed onboarding
         UserModel(
             userId: UUID().uuidString,
-            dateCreated: Date().addingTimeInterval(-86400 * 15),
+            creationDate: Date().addingTimeInterval(-86400 * 15),
             didCompleteOnBoarding: true,
             profileColorHex: "#FF6B6B"
         ),
         // Active user - completed onboarding
         UserModel(
             userId: UUID().uuidString,
-            dateCreated: Date().addingTimeInterval(-86400 * 60),
+            creationDate: Date().addingTimeInterval(-86400 * 60),
             didCompleteOnBoarding: true,
             profileColorHex: "#95E1D3"
         ),
         // Long-time user - completed onboarding
         UserModel(
             userId: UUID().uuidString,
-            dateCreated: Date().addingTimeInterval(-86400 * 180),
+            creationDate: Date().addingTimeInterval(-86400 * 180),
             didCompleteOnBoarding: true,
             profileColorHex: "#F38181"
         )

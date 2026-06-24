@@ -10,7 +10,8 @@ import AuthenticationServices
 
 struct CreateAccountView: View {
     @Environment(\.dismiss) private var dismiss
-    @Environment(\.authService) private var authservice
+    @Environment(AuthManager.self) private var authManager
+    @Environment(UserManager.self) private var userManager
     let title: String
     let subtitle: String
 
@@ -49,7 +50,7 @@ struct CreateAccountView: View {
     private func onSignInWithApplePressed() {
         Task {
             do {
-               _ = try await authservice.signInApple()
+               _ = try await authManager.signInApple()
             } catch {
                 // Handle error silently or show alert
             }
@@ -60,9 +61,13 @@ struct CreateAccountView: View {
     private func onSignInWithGooglePressed() {
         Task {
             do {
-               _ = try await authservice.signInGoogle()
+               let result = try await authManager.signInGoogle()
+                print("Google Sign-In succesful for user: \(result.user.uid)")
+                try await userManager.login(auth: result.user, isNewUser: result.isNewuser)
             } catch {
-                // Handle error silently or show alert
+                print("Google Sign-In failure for: \(error)")
+                try await Task.sleep(for: .seconds(5))
+                onSignInWithGooglePressed()
             }
             dismiss()
         }
@@ -74,4 +79,6 @@ struct CreateAccountView: View {
         title: "Create Account?",
         subtitle: "Don't lose your data! Connect to an SSO provider to save your account."
     )
+    .environment(AuthManager(authService: MockAuthService()))
+    
 }

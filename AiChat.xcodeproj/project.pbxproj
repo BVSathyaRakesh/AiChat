@@ -13,6 +13,7 @@
 		8AE3882E2FEB942300E5A9DA /* SignInAppleAsync in Frameworks */ = {isa = PBXBuildFile; productRef = 8AE3882D2FEB942300E5A9DA /* SignInAppleAsync */; };
 		8AE388372FEBACBA00E5A9DA /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = 8AE388362FEBACBA00E5A9DA /* GoogleSignIn */; };
 		8AE388392FEBACBA00E5A9DA /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 8AE388382FEBACBA00E5A9DA /* GoogleSignInSwift */; };
+		8AE388492FEC1C3900E5A9DA /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 8AE388482FEC1C3900E5A9DA /* FirebaseFirestore */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -80,6 +81,7 @@
 				8AE388392FEBACBA00E5A9DA /* GoogleSignInSwift in Frameworks */,
 				8AB858842FEACC2700B3391F /* FirebaseAuth in Frameworks */,
 				8AB857282FE6E77D00B3391F /* SwiftfulUtilities in Frameworks */,
+				8AE388492FEC1C3900E5A9DA /* FirebaseFirestore in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -106,6 +108,7 @@
 				8AB853AE2FDF09B400B3391F /* AiChat */,
 				8AB853BC2FDF09B500B3391F /* AiChatTests */,
 				8AB853C62FDF09B500B3391F /* AiChatUITests */,
+				8AE388452FEC1B7700E5A9DA /* Frameworks */,
 				8AB853AD2FDF09B400B3391F /* Products */,
 			);
 			sourceTree = "<group>";
@@ -118,6 +121,13 @@
 				8AB853C32FDF09B500B3391F /* AiChatUITests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		8AE388452FEC1B7700E5A9DA /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -147,6 +157,7 @@
 				8AE3882D2FEB942300E5A9DA /* SignInAppleAsync */,
 				8AE388362FEBACBA00E5A9DA /* GoogleSignIn */,
 				8AE388382FEBACBA00E5A9DA /* GoogleSignInSwift */,
+				8AE388482FEC1C3900E5A9DA /* FirebaseFirestore */,
 			);
 			productName = AiChat;
 			productReference = 8AB853AC2FDF09B400B3391F /* AiChat.app */;
@@ -738,6 +749,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 8AE388352FEBACBA00E5A9DA /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
 			productName = GoogleSignInSwift;
+		};
+		8AE388482FEC1C3900E5A9DA /* FirebaseFirestore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8AB858822FEACC2700B3391F /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseFirestore;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

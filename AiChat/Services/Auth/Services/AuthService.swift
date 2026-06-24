@@ -7,9 +7,6 @@
 
 import SwiftUI
 
-extension EnvironmentValues {
-    @Entry var authService: AuthService = MockAuthService()
-}
 
 protocol AuthService {
     func getAuthenticatedUser() -> UserAuthInfo?
@@ -19,4 +16,5 @@ protocol AuthService {
     func signInGoogle() async throws -> (user: UserAuthInfo, isNewuser: Bool)
     func signout() throws
     func deleteAccount() async throws
+    func addAuthenticatedUserListener(onListenerAttached: (any NSObjectProtocol) -> Void) -> AsyncStream<UserAuthInfo?>
 }

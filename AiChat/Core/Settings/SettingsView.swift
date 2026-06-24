@@ -10,7 +10,7 @@ import SwiftfulUtilities
 
 struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
-    @Environment(\.authService) private var authService
+    @Environment(AuthManager.self) private var authManager
     @Environment(AppState.self) private var appState
     @State private var isPremium: Bool = false
     @State private var isAnonymousUser: Bool = true
@@ -143,7 +143,7 @@ struct SettingsView: View {
     func onSignoutPressed() {
         Task {
             do {
-                try authService.signout()
+                try authManager.signout()
                 await setAnonymousAccountStatus() // Refresh UI state
                 try? await Task.sleep(for: .seconds(1))
                 appState.updateViewState(showTabBarView: false)
@@ -167,7 +167,7 @@ struct SettingsView: View {
     private func onDeleteAccountConfirmationPressed() {
         Task {
             do {
-                try await authService.deleteAccount()
+                try await authManager.deleteAccount()
                 await setAnonymousAccountStatus() // Refresh UI state
                 try? await Task.sleep(for: .seconds(1))
                 appState.updateViewState(showTabBarView: false)
@@ -184,11 +184,11 @@ struct SettingsView: View {
     
     func setAnonymousAccountStatus() async {
         do {
-            let user = try await authService.getAuthenticatedUserRefreshed()
+            let user = try await authManager.getAuthenticatedUserRefreshed()
             isUserSignedIn = user != nil
             isAnonymousUser = user?.isAnonymous == true
         } catch {
-            let user = authService.getAuthenticatedUser()
+            let user = authManager.auth
             isUserSignedIn = user != nil
             isAnonymousUser = user?.isAnonymous == true
         }
@@ -207,18 +207,18 @@ fileprivate extension View {
 
 #Preview("No Auth") {
     SettingsView()
-        .environment(\.authService, MockAuthService(user: nil))
+        .environment(AuthManager(authService: MockAuthService(user: nil)))
         .environment(AppState())
 }
 
 #Preview("SignIn Anonymously") {
     SettingsView()
-        .environment(\.authService, MockAuthService(user: UserAuthInfo.mock(isAnonymous: true)))
+        .environment(AuthManager(authService: MockAuthService(user: UserAuthInfo.mock(isAnonymous: true))))
         .environment(AppState())
 }
 
 #Preview("SignIn with Google") {
     SettingsView()
-        .environment(\.authService, MockAuthService(user: UserAuthInfo.mock(isAnonymous: false)))
+        .environment(AuthManager(authService: MockAuthService(user: UserAuthInfo.mock(isAnonymous: true))))
         .environment(AppState())
 }
