@@ -9,6 +9,7 @@ import SwiftUI
 
 struct ProfileView: View {
     
+    @Environment(UserManager.self) private var userManager
     @State private var showSettings: Bool = false
     @State private var user: UserModel? = .mock
     @State private var createNewAvatarView: Bool = false
@@ -131,6 +132,7 @@ struct ProfileView: View {
     }
     
     private func loadData() async {
+        user = userManager.currentuser
         try? await Task.sleep(for: .seconds(5))
         isLoading = false
         myAVatars = AvatarModal.mocks
@@ -140,4 +142,5 @@ struct ProfileView: View {
 #Preview {
     ProfileView()
         .environment(AppState())
+        .environment(UserManager(userService: MockUserService(user: UserModel.mock)))
 }

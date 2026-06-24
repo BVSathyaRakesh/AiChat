@@ -10,6 +10,7 @@ import SwiftUI
 struct OnBoardingCompletedView: View {
 
     @Environment(AppState.self) private var root
+    @Environment(UserManager.self) private var userManager
     var selectedColor: Color = .orange
 
     var body: some View {
@@ -36,9 +37,15 @@ struct OnBoardingCompletedView: View {
     }
 
     private func onFinishButtonPressed() async {
-        // other logic to complete onboarding
-        try? await Task.sleep(for: .seconds(3))
-        root.updateViewState(showTabBarView: true)
+        do {
+            let colorHex = selectedColor.toHex() ?? "#4ECDC4"
+            try await userManager.completeOnboarding(profileColorHex: colorHex)
+            root.updateViewState(showTabBarView: true)
+        } catch {
+            print("Failed to complete onboarding: \(error)")
+            // Still allow user to proceed even if update fails
+            root.updateViewState(showTabBarView: true)
+        }
     }
 }
 
@@ -46,5 +53,6 @@ struct OnBoardingCompletedView: View {
     NavigationStack {
         OnBoardingCompletedView()
             .environment(AppState())
+            .environment(UserManager(userService: MockUserService()))
     }
 }

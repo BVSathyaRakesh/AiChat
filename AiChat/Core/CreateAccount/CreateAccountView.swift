@@ -50,7 +50,19 @@ struct CreateAccountView: View {
     private func onSignInWithApplePressed() {
         Task {
             do {
-               _ = try await authManager.signInApple()
+                // Capture anonymous user ID before sign-in (in case we switch accounts)
+                let oldUserId = authManager.auth?.uid
+                let wasAnonymous = authManager.auth?.isAnonymous == true
+
+                let result = try await authManager.signInApple()
+
+                // If we switched accounts (old anonymous -> existing account), delete old Firestore doc
+                if wasAnonymous, let oldId = oldUserId, oldId != result.user.uid {
+                    try? await userManager.deleteUser(userId: oldId)
+                }
+
+                // Create/update Firestore document for the current account
+                try await userManager.login(auth: result.user, isNewUser: result.isNewuser)
             } catch {
                 // Handle error silently or show alert
             }
@@ -61,8 +73,18 @@ struct CreateAccountView: View {
     private func onSignInWithGooglePressed() {
         Task {
             do {
-               let result = try await authManager.signInGoogle()
-                print("Google Sign-In succesful for user: \(result.user.uid)")
+                // Capture anonymous user ID before sign-in (in case we switch accounts)
+                let oldUserId = authManager.auth?.uid
+                let wasAnonymous = authManager.auth?.isAnonymous == true
+
+                let result = try await authManager.signInGoogle()
+
+                // If we switched accounts (old anonymous -> existing account), delete old Firestore doc
+                if wasAnonymous, let oldId = oldUserId, oldId != result.user.uid {
+                    try? await userManager.deleteUser(userId: oldId)
+                }
+
+                // Create/update Firestore document for the current account
                 try await userManager.login(auth: result.user, isNewUser: result.isNewuser)
             } catch {
                 print("Google Sign-In failure for: \(error)")
@@ -80,5 +102,5 @@ struct CreateAccountView: View {
         subtitle: "Don't lose your data! Connect to an SSO provider to save your account."
     )
     .environment(AuthManager(authService: MockAuthService()))
-    
+    .environment(UserManager(userService: MockUserService()))
 }
