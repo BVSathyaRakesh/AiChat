@@ -10,12 +10,15 @@ import SwiftUI
 struct CreateAvatarView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(AIManager.self) private var aiManager
+    @Environment(AuthManager.self) private var authManager
+    @Environment(AvatarManager.self) private var avatarManager
     @State private var avatarName: String = ""
     @State private var selectedCharacter: CharecterOption = .default
     @State private var selectedAction: CharecterAction = .default
     @State private var selectedLocation: CharcterLocation = .default
     @State private var generatedImageURL: String?
     @State private var isGeneratingImage: Bool = false
+    @State private var showAlert: AnyAppAlert?
 
     var body: some View {
         NavigationStack {
@@ -56,19 +59,43 @@ struct CreateAvatarView: View {
                     }
                 }
             }
+            .showCustomAlert(alert: $showAlert)
         }
     }
 
     private var nameTextField: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("NAME YOUR AVATAR*")
-                .font(.caption)
-                .foregroundStyle(.secondary)
+            HStack {
+                Text("NAME YOUR AVATAR*")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
 
-            TextField("", text: $avatarName)
+                Spacer()
+
+                Text("\(avatarName.count) / 30")
+                    .font(.caption2)
+                    .foregroundStyle(avatarName.count > 30 ? .red : (avatarName.count > 3 ? .green : .secondary))
+            }
+
+            TextField("Enter avatar name (3-30 characters)", text: $avatarName)
                 .padding()
                 .background(Color(uiColor: .systemBackground))
                 .cornerRadius(12)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(
+                            avatarName.count > 30 ? Color.red.opacity(0.5) :
+                            avatarName.count > 3 ? Color.green.opacity(0.3) :
+                            Color.clear,
+                            lineWidth: 1
+                        )
+                )
+                .onChange(of: avatarName) { oldValue, newValue in
+                    // Limit to 30 characters
+                    if newValue.count > 30 {
+                        avatarName = String(newValue.prefix(30))
+                    }
+                }
         }
     }
 
@@ -226,17 +253,44 @@ struct CreateAvatarView: View {
                 generatedImageURL = try await aiManager.generateImage(input: prompt)
                 print("Generated image URL: \(generatedImageURL ?? "nil")")
             } catch {
+                showAlert = AnyAppAlert(
+                    title: "Image Generation Failed",
+                    subtitle: "Unable to generate avatar image. Please try again.",
+                    showButtons: {
+                        AnyView(
+                            Button("OK", role: .cancel) { }
+                        )
+                    }
+                )
                 print("Error generating image: \(error)")
             }
             isGeneratingImage = false
         }
     }
 
-    private func saveAvatar() async {
-        // Save avatar logic
-        print("Save avatar: \(avatarName)")
-        try? await Task.sleep(for: .seconds(1))
-
+    fileprivate func performAvatarAction() async throws {
+        try TextValidationHelper.validateTextField(text: avatarName)
+        
+        let uid = try authManager.getAuthId()
+        
+        let avatar = AvatarModal(
+            avatarId: UUID().uuidString,
+            name: avatarName,
+            charcterOption: selectedCharacter,
+            charcterAction: selectedAction,
+            charcetrLocation: selectedLocation,
+            profileImageName: generatedImageURL,
+            authorId: uid,
+            dateCreated: .now
+        )
+        
+        // Save avatar to Firestore
+        try await avatarManager.saveAvatarData(avatarModel: avatar)
+        
+        print("✅ Avatar saved successfully!")
+        print("Avatar ID: \(avatar.avatarId)")
+        print("Image URL: \(generatedImageURL ?? "nil")")
+        
         // Clear all values
         avatarName = ""
         selectedCharacter = .default
@@ -244,12 +298,26 @@ struct CreateAvatarView: View {
         selectedLocation = .default
         generatedImageURL = nil
         isGeneratingImage = false
-
+        
         dismiss()
+    }
+    
+    private func saveAvatar() async {
+        print("Saving avatar: \(avatarName)")
+
+        do {
+            try await performAvatarAction()
+        } catch {
+            // Show error alert using custom alert system
+            showAlert = AnyAppAlert(error: error)
+            print("❌ Error saving avatar: \(error.localizedDescription)")
+        }
     }
 }
 
 #Preview {
     CreateAvatarView()
         .environment(AIManager(aiService: MockAIService()))
+        .environment(AuthManager(authService: MockAuthService(user: .mock())))
+        .environment(AvatarManager(service: MockAvatarService()))
 }

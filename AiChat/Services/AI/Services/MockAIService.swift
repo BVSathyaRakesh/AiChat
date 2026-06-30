@@ -5,6 +5,7 @@
 //  Created by Sathya Kumar on 30/06/26.
 //
 
+import Foundation
 
 struct MockAIService: AIService {
 

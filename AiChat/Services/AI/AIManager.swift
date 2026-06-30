@@ -5,6 +5,7 @@
 //  Created by Sathya Kumar on 30/06/26.
 //
 import SwiftUI
+
 @Observable
 class AIManager: AIService {
 

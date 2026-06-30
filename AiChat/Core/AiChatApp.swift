@@ -20,6 +20,7 @@ struct AiChatApp: App {
                 .environment(delegate.dependecies.authManager)
                 .environment(delegate.dependecies.userManager)
                 .environment(delegate.dependecies.aiImanager)
+                .environment(delegate.dependecies.avatarManager)
         }
     }
 }
@@ -58,10 +59,13 @@ struct Dependencies {
     let authManager: AuthManager!
     let userManager: UserManager!
     let aiImanager: AIManager!
+    let avatarManager: AvatarManager!
 
     init() {
         authManager = AuthManager(authService: FirebaseAuthService())
         userManager = UserManager(services: ProductionUserServices())
         aiImanager = AIManager(aiService: PollinationsAIService())
+        avatarManager = AvatarManager(service: FirebaseAvatarService())
     }
 }
+

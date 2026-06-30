@@ -8,8 +8,10 @@
 import SwiftUI
 
 struct ProfileView: View {
-    
+
     @Environment(UserManager.self) private var userManager
+    @Environment(AvatarManager.self) private var avatarManager
+    @Environment(AuthManager.self) private var authManager
     @State private var showSettings: Bool = false
     @State private var user: UserModel? = .mock
     @State private var createNewAvatarView: Bool = false
@@ -128,14 +130,36 @@ struct ProfileView: View {
     
     private func onDeleteAvtar(indexSet: IndexSet) {
         guard let index = indexSet.first else { return }
-        myAVatars.remove(at: index)
+        let avatar = myAVatars[index]
+
+        Task {
+            do {
+                try await avatarManager.deleteAvatar(avatarId: avatar.avatarId)
+                myAVatars.remove(at: index)
+                print("✅ Avatar deleted successfully")
+            } catch {
+                print("❌ Error deleting avatar: \(error.localizedDescription)")
+            }
+        }
     }
-    
+
     private func loadData() async {
+        isLoading = true
         user = userManager.currentuser
-        try? await Task.sleep(for: .seconds(5))
+
+        do {
+            let uid = try authManager.getAuthId()
+
+            // Fetch user's avatars from Firestore
+            myAVatars = try await avatarManager.fetchUserAvatars(userId: uid)
+
+            print("✅ Loaded \(myAVatars.count) avatars")
+        } catch {
+            print("❌ Error loading avatars: \(error.localizedDescription)")
+            myAVatars = []
+        }
+
         isLoading = false
-        myAVatars = AvatarModal.mocks
     }
 }
 
@@ -143,4 +167,6 @@ struct ProfileView: View {
     ProfileView()
         .environment(AppState())
         .environment(UserManager(services: MockUserServices(userModal: .mock)))
+        .environment(AvatarManager(service: MockAvatarService()))
+        .environment(AuthManager(authService: MockAuthService(user: .mock())))
 }

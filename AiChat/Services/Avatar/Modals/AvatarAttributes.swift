@@ -5,13 +5,13 @@
 //  Created by Sathya Kumar on 21/06/26.
 //
 
-enum CharecterOption: String, CaseIterable, Hashable {
+enum CharecterOption: String, CaseIterable, Hashable, Codable {
     case man, woman, cat, dog, alien
-    
+
     static var `default`: Self {
         .man
     }
-    
+
     var plural: String {
         switch self {
         case .man:
@@ -22,7 +22,7 @@ enum CharecterOption: String, CaseIterable, Hashable {
             return rawValue + "s"
         }
     }
-    
+
     var startsWithVowel: Bool {
         switch self {
         case .alien:
@@ -33,7 +33,7 @@ enum CharecterOption: String, CaseIterable, Hashable {
     }
 }
 
-enum CharecterAction: String, CaseIterable {
+enum CharecterAction: String, CaseIterable, Codable {
     case smiling, sitting, standing, walking, running, eating, drinking, working, crying, relaxing, fighting
 
     static var `default`: Self {
@@ -41,7 +41,7 @@ enum CharecterAction: String, CaseIterable {
     }
 }
 
-enum CharcterLocation: String, CaseIterable {
+enum CharcterLocation: String, CaseIterable, Codable {
     case park, mall, musem, city, desert, forest, space
 
     static var `default`: Self {

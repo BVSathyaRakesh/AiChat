@@ -13,7 +13,7 @@ struct Constants {
     static var termsOfServiceURL = "https://www.apple.com/"
 
     // AI Image Generation
-    struct AI {
+    struct AIConstants {
         static let pollinationsBaseURL = "https://image.pollinations.ai/prompt/"
         static let defaultImageWidth = 512
         static let defaultImageHeight = 512

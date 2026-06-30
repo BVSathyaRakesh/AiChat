@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct AvatarModal: Hashable {
+struct AvatarModal: Codable, Hashable {
     let avatarId: String
     let name: String?
     let charcterOption: CharecterOption?
@@ -35,6 +35,17 @@ struct AvatarModal: Hashable {
         self.profileImageName = profileImageName
         self.authorId = authorId
         self.dateCreated = dateCreated
+    }
+    
+    enum CodingKeys: String,CodingKey {
+        case avatarId = "avatar_id"
+        case name
+        case charcterOption = "charecter_option"
+        case charcterAction = "charceter_action"
+        case charcetrLocation = "charceter_location"
+        case profileImageName = "profile_image_name"
+        case authorId = "author_id"
+        case dateCreated = "date_created"
     }
     
     var charecterDescription: String {

@@ -8,28 +8,42 @@ import Foundation
 struct TextValidationHelper {
     enum ValidationError: LocalizedError {
         case textTooShort(min: Int)
+        case textTooLong(max: Int)
         case hasBadWords
+
         var errorDescription: String? {
             switch self {
             case .textTooShort(min: let min):
-                return "Please enter minimum \(min) charceters"
+                return "Please enter at least \(min) characters"
+            case .textTooLong(max: let max):
+                return "Maximum \(max) characters allowed"
             case .hasBadWords:
-                return "Bad words detected. Please rephrase your message"
+                return "Inappropriate language detected. Please rephrase."
             }
         }
     }
-    
-    static func validateTextField(text: String) throws {
-        let minimumCharecterCount = 3
+
+    static func validateTextField(text: String, minLength: Int = 3, maxLength: Int = 30) throws {
         let badWords = ["shit", "bitch", "ass"]
-        
-        guard text.count > minimumCharecterCount else {
-            throw ValidationError.textTooShort(min: minimumCharecterCount)
+
+        // Trim whitespace
+        let trimmedText = text.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        guard !trimmedText.isEmpty else {
+            throw ValidationError.textTooShort(min: minLength)
         }
-        
+
+        guard trimmedText.count > minLength else {
+            throw ValidationError.textTooShort(min: minLength)
+        }
+
+        guard trimmedText.count <= maxLength else {
+            throw ValidationError.textTooLong(max: maxLength)
+        }
+
         guard !text.containsAny(of: badWords) else {
             throw ValidationError.hasBadWords
         }
     }
-    
+
 }
