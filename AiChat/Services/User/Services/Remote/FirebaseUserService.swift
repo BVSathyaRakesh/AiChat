@@ -7,7 +7,9 @@
 
 import FirebaseFirestore
 
-struct FirebaseUserService: UserService {
+
+
+struct FirebaseUserService: RemoteUserService {
     
     var collection: CollectionReference {
         Firestore.firestore().collection("users")

@@ -16,23 +16,18 @@ struct AiChatApp: App {
 
     var body: some Scene {
         WindowGroup {
-            EnvironmentViewBuilder {
                 AppView()
-            }
+                .environment(delegate.authManager)
+                .environment(delegate.userManager)
         }
     }
 }
 
-struct EnvironmentViewBuilder<Content: View>: View {
-    @ViewBuilder var content: () -> Content
-    var body: some View {
-        content()
-            .environment(AuthManager(authService: FirebaseAuthService()))
-            .environment(UserManager(userService: FirebaseUserService()))
-    }
-}
-
 class AppDelegate: NSObject, UIApplicationDelegate {
+    
+    var authManager: AuthManager!
+    var userManager: UserManager!
+    
     func application(
         _ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
@@ -44,6 +39,9 @@ class AppDelegate: NSObject, UIApplicationDelegate {
             let config = GIDConfiguration(clientID: clientID)
             GIDSignIn.sharedInstance.configuration = config
         }
+        
+        authManager = AuthManager(authService: FirebaseAuthService())
+        userManager = UserManager(services: ProductionUserServices())
 
         return true
     }

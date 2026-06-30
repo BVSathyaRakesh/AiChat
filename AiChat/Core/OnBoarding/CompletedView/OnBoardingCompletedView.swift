@@ -53,6 +53,6 @@ struct OnBoardingCompletedView: View {
     NavigationStack {
         OnBoardingCompletedView()
             .environment(AppState())
-            .environment(UserManager(userService: MockUserService()))
+            .environment(UserManager(services: MockUserServices(userModal: .mock)))
     }
 }

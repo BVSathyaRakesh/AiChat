@@ -217,20 +217,20 @@ fileprivate extension View {
 #Preview("No Auth") {
     SettingsView()
         .environment(AuthManager(authService: MockAuthService(user: nil)))
-        .environment(UserManager(userService: MockUserService()))
+        .environment(UserManager(services: MockUserServices(userModal: .mock)))
         .environment(AppState())
 }
 
 #Preview("SignIn Anonymously") {
     SettingsView()
         .environment(AuthManager(authService: MockAuthService(user: UserAuthInfo.mock(isAnonymous: true))))
-        .environment(UserManager(userService: MockUserService()))
+        .environment(UserManager(services: MockUserServices(userModal: .mock)))
         .environment(AppState())
 }
 
 #Preview("SignIn with Google") {
     SettingsView()
         .environment(AuthManager(authService: MockAuthService(user: UserAuthInfo.mock(isAnonymous: false))))
-        .environment(UserManager(userService: MockUserService()))
+        .environment(UserManager(services: MockUserServices(userModal: .mock)))
         .environment(AppState())
 }

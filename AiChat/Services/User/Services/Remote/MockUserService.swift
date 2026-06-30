@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct MockUserService: UserService {
+struct MockUserService: RemoteUserService {
 
     let currentUser: UserModel?
 

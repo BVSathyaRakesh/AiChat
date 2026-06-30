@@ -102,5 +102,5 @@ struct CreateAccountView: View {
         subtitle: "Don't lose your data! Connect to an SSO provider to save your account."
     )
     .environment(AuthManager(authService: MockAuthService()))
-    .environment(UserManager(userService: MockUserService()))
+    .environment(UserManager(services: MockUserServices(userModal: .mock)))
 }

@@ -11,34 +11,45 @@ import FirebaseFirestore
 
 @MainActor
 @Observable
-class UserManager {
-
-    private let userService: UserService
+class UserManager: UserServices {
+    
+    internal let local: LocalUserPersistance
+    internal let remote: RemoteUserService
     private(set) var currentuser: UserModel?
     private var listener: AnyObject?
 
-    init(userService: UserService) {
-        self.userService = userService
-        self.currentuser = nil
+    init(services: UserServices) {
+        self.remote = services.remote
+        self.local = services.local
+        self.currentuser = local.getCurrentUser()
+        print("get current user is: \(self.currentuser, default: "")")
+        print(NSHomeDirectory())
     }
 
     func login(auth: UserAuthInfo, isNewUser: Bool) async throws {
         let creationVersion = isNewUser ? Utilities.appVersion : nil
         let user = UserModel(auth: auth, createionVersion: creationVersion)
-        try await userService.saveUser(user: user)
+        try await remote.saveUser(user: user)
         startListening(userId: auth.uid)
     }
     
+    private func saveUserLocally(user: UserModel) {
+        do {
+           try local.saveUser(user: user)
+        } catch {
+            print("Failed to save user locall: \(error)")
+        }
+    }
     
     func deleteUser(userId: String) async throws {
-        try await userService.deleteUser(userId: userId)
+        try await remote.deleteUser(userId: userId)
     }
 
     func completeOnboarding(profileColorHex: String) async throws {
         guard let userId = currentuser?.userId else {
             throw UserServiceError.userNotFound
         }
-        try await userService.updateOnboardingComplete(userId: userId, profileColorHex: profileColorHex)
+        try await remote.updateOnboardingComplete(userId: userId, profileColorHex: profileColorHex)
     }
 
     func logout() {
@@ -47,10 +58,13 @@ class UserManager {
 
     private func startListening(userId: String) {
         Task {
-            for await user in userService.addUserListener(userId: userId, onListenerAttached: { listener in
+            for await user in remote.addUserListener(userId: userId, onListenerAttached: { listener in
                 self.listener = listener
             }) {
                 self.currentuser = user
+                if let user = user {
+                    saveUserLocally(user: user)
+                }
                 print("User Listener success: \(user?.userId ?? "no userId")")
             }
         }
