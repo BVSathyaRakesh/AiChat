@@ -17,16 +17,16 @@ struct AiChatApp: App {
     var body: some Scene {
         WindowGroup {
                 AppView()
-                .environment(delegate.authManager)
-                .environment(delegate.userManager)
+                .environment(delegate.dependecies.authManager)
+                .environment(delegate.dependecies.userManager)
+                .environment(delegate.dependecies.aiImanager)
         }
     }
 }
 
 class AppDelegate: NSObject, UIApplicationDelegate {
     
-    var authManager: AuthManager!
-    var userManager: UserManager!
+    var dependecies: Dependencies!
     
     func application(
         _ application: UIApplication,
@@ -40,8 +40,7 @@ class AppDelegate: NSObject, UIApplicationDelegate {
             GIDSignIn.sharedInstance.configuration = config
         }
         
-        authManager = AuthManager(authService: FirebaseAuthService())
-        userManager = UserManager(services: ProductionUserServices())
+        dependecies = Dependencies()
 
         return true
     }
@@ -52,5 +51,17 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         options: [UIApplication.OpenURLOptionsKey: Any] = [:]
     ) -> Bool {
         return GIDSignIn.sharedInstance.handle(url)
+    }
+}
+
+struct Dependencies {
+    let authManager: AuthManager!
+    let userManager: UserManager!
+    let aiImanager: AIManager!
+
+    init() {
+        authManager = AuthManager(authService: FirebaseAuthService())
+        userManager = UserManager(services: ProductionUserServices())
+        aiImanager = AIManager(aiService: PollinationsAIService())
     }
 }

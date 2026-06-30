@@ -9,6 +9,7 @@ import SwiftUI
 
 struct CreateAvatarView: View {
     @Environment(\.dismiss) private var dismiss
+    @Environment(AIManager.self) private var aiManager
     @State private var avatarName: String = ""
     @State private var selectedCharacter: CharecterOption = .default
     @State private var selectedAction: CharecterAction = .default
@@ -179,16 +180,26 @@ struct CreateAvatarView: View {
 
     private var avatarImageView: some View {
         ZStack {
-                Circle()
-                    .fill(Color.gray.opacity(0.2))
-                    .frame(width: 200, height: 200)
+            Circle()
+                .fill(Color.gray.opacity(0.2))
+                .frame(width: 200, height: 200)
 
-                if let imageURL = generatedImageURL {
-                    ImageLoaderView(urlString: imageURL)
-                        .aspectRatio(1, contentMode: .fill)
-                        .frame(width: 200, height: 200)
-                        .clipShape(Circle())
+            if let imageURL = generatedImageURL {
+                ImageLoaderView(urlString: imageURL)
+                    .aspectRatio(1, contentMode: .fill)
+                    .frame(width: 200, height: 200)
+                    .clipShape(Circle())
+            } else {
+                VStack(spacing: 8) {
+                    Image(systemName: "person.circle.fill")
+                        .font(.system(size: 60))
+                        .foregroundStyle(.gray.opacity(0.5))
+
+                    Text("No image")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
                 }
+            }
         }
         .frame(maxWidth: .infinity, alignment: .trailing)
     }
@@ -204,10 +215,20 @@ struct CreateAvatarView: View {
     private func generateImage() {
         // Generate AI image based on selected options
         Task {
-            try?  await Task.sleep(for: .seconds(2))
-              generatedImageURL = Constants.randomImage
-              print("Generate image: \(selectedCharacter.rawValue) \(selectedAction.rawValue) in \(selectedLocation.rawValue)")
-              isGeneratingImage = false
+            do {
+                let prompt = AvatarDescriptionBuilder(
+                    charecterOption: selectedCharacter,
+                    charecterAction: selectedAction,
+                    charceterLocation: selectedLocation
+                ).charcterDescription
+
+                print("Generating image with prompt: \(prompt)")
+                generatedImageURL = try await aiManager.generateImage(input: prompt)
+                print("Generated image URL: \(generatedImageURL ?? "nil")")
+            } catch {
+                print("Error generating image: \(error)")
+            }
+            isGeneratingImage = false
         }
     }
 
@@ -230,4 +251,5 @@ struct CreateAvatarView: View {
 
 #Preview {
     CreateAvatarView()
+        .environment(AIManager(aiService: MockAIService()))
 }
