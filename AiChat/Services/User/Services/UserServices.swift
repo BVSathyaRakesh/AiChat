@@ -14,7 +14,7 @@ protocol UserServices {
 
 struct ProductionUserServices: UserServices {
     var remote: RemoteUserService
-    var local:  LocalUserPersistance
+    var local: LocalUserPersistance
     
     init(userModal: UserModel? = nil) {
         self.remote = FirebaseUserService()
@@ -31,7 +31,6 @@ struct MockUserServices: UserServices {
         self.remote = MockUserService(user: userModal)
     }
 }
-
 
 enum UserServiceError: LocalizedError {
     case userNotFound

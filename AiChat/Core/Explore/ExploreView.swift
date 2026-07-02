@@ -65,7 +65,7 @@ struct ExploreView: View {
                         image: avatar.profileImageName
                     )
                     .anyButton {
-                        onCategoryPressed(category: avatar.charcterOption ?? .alien, imageName: avatar.profileImageName ?? Constants.randomImage)
+                        onAVatarPressed(avatar: avatar)
                     }
                 }
             }
@@ -116,7 +116,8 @@ struct ExploreView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .contentShape(Rectangle())
                     .anyButton(.highlight) {
-                        onAVatarPressed(avatar: avatar)
+                        onCategoryPressed(category: avatar.charcterOption ?? .alien, imageName: avatar.profileImageName ?? Constants.randomImage)
+                        
                     }
                     if index < popularAvatars.count - 1 {
                         Divider()

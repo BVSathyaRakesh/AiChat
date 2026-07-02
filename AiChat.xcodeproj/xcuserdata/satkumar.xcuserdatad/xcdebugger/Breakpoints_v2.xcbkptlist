@@ -14,8 +14,8 @@
             filePath = "AiChat/Services/Avatar/AvatarManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "30"
-            endingLineNumber = "30"
+            startingLineNumber = "39"
+            endingLineNumber = "39"
             landmarkName = "AvatarManager"
             landmarkType = "3">
          </BreakpointContent>

@@ -11,4 +11,3 @@ protocol LocalUserPersistance {
     func getCurrentUser() -> UserModel?
     func saveUser(user: UserModel) throws
 }
-

@@ -49,7 +49,7 @@ struct UserModel: Codable {
         )
     }
     
-    enum CodingKeys: String,CodingKey {
+    enum CodingKeys: String, CodingKey {
         case userId = "user_id"
         case email
         case isAnonymous = "is_anonymous"

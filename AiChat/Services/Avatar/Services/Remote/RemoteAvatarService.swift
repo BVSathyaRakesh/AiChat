@@ -5,9 +5,9 @@
 //  Created by Sathya Kumar on 02/07/26.
 //
 
-
-protocol AvatarService {
+protocol RemoteAvatarService {
     func createAvatar(avatar: AvatarModal) async throws
+    func getAvatarById(avatarId: String) async throws -> AvatarModal
     func fetchUserAvatarsForAuthor(userId: String) async throws -> [AvatarModal]
     func fetchFeaturedAvatars(limit: Int) async throws -> [AvatarModal]
     func fetchPopularAvatars(limit: Int) async throws -> [AvatarModal]

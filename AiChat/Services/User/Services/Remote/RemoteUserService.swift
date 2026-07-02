@@ -5,7 +5,6 @@
 //  Created by Sathya Kumar on 30/06/26.
 //
 
-
 protocol RemoteUserService {
     func saveUser(user: UserModel) async throws
     func addUserListener(userId: String, onListenerAttached: (AnyObject) -> Void) -> AsyncStream<UserModel?>

@@ -37,7 +37,7 @@ struct AvatarModal: Codable, Hashable {
         self.dateCreated = dateCreated
     }
     
-    enum CodingKeys: String,CodingKey {
+    enum CodingKeys: String, CodingKey {
         case avatarId = "avatar_id"
         case name
         case charcterOption = "charecter_option"

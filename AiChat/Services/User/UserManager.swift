@@ -22,8 +22,6 @@ class UserManager: UserServices {
         self.remote = services.remote
         self.local = services.local
         self.currentuser = local.getCurrentUser()
-        print("get current user is: \(self.currentuser, default: "")")
-        print(NSHomeDirectory())
     }
 
     func login(auth: UserAuthInfo, isNewUser: Bool) async throws {

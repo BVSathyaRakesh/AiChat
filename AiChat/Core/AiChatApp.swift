@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 import FirebaseCore
 import GoogleSignIn
 
@@ -65,7 +66,9 @@ struct Dependencies {
         authManager = AuthManager(authService: FirebaseAuthService())
         userManager = UserManager(services: ProductionUserServices())
         aiImanager = AIManager(aiService: PollinationsAIService())
-        avatarManager = AvatarManager(service: FirebaseAvatarService())
+        avatarManager = AvatarManager(
+            service: FirebaseAvatarService(),
+            local: SwiftDataLocalAvatarPersistance()
+        )
     }
 }
-

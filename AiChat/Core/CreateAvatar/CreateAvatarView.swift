@@ -90,7 +90,7 @@ struct CreateAvatarView: View {
                             lineWidth: 1
                         )
                 )
-                .onChange(of: avatarName) { oldValue, newValue in
+                .onChange(of: avatarName) { _, newValue in
                     // Limit to 30 characters
                     if newValue.count > 30 {
                         avatarName = String(newValue.prefix(30))

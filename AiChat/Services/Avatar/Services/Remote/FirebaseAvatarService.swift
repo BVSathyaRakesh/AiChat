@@ -13,12 +13,12 @@ extension QuerySnapshot {
     }
 }
 
-struct FirebaseAvatarService: AvatarService {
+struct FirebaseAvatarService: RemoteAvatarService {
 
     var collection: CollectionReference {
         Firestore.firestore().collection("avatars")
     }
-
+    
     func createAvatar(avatar: AvatarModal) async throws {
         try collection.document(avatar.avatarId).setData(from: avatar, merge: true)
     }
@@ -29,6 +29,18 @@ struct FirebaseAvatarService: AvatarService {
             .getDocuments()
 
         return try snapshot.decode(as: AvatarModal.self)
+    }
+    
+    func getAvatarById(avatarId: String) async throws -> AvatarModal {
+        let document = try await collection
+            .document(avatarId)
+            .getDocument()
+
+        guard let avatar = try? document.data(as: AvatarModal.self) else {
+            throw NSError(domain: "AvatarService", code: 404, userInfo: [NSLocalizedDescriptionKey: "Avatar not found"])
+        }
+
+        return avatar
     }
 
     func fetchFeaturedAvatars(limit: Int = 20) async throws -> [AvatarModal] {

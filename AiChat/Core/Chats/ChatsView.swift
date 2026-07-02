@@ -128,8 +128,7 @@ struct ChatsView: View {
         defer { isLoadingAvatars = false }
 
         do {
-            // TODO: Replace with actual user ID when authentication is implemented
-            avatars = try await avatarManager.fetchUserAvatars(userId: "current_user_id")
+            avatars = try  await avatarManager.getRecentAvatars()
         } catch {
             alert = AnyAppAlert(error: error)
         }

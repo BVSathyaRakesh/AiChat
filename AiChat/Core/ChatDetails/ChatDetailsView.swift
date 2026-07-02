@@ -9,6 +9,7 @@ import SwiftUI
 
 struct ChatDetailsView: View {
     
+    @Environment(AvatarManager.self) private var avatarManager
     @State private var chatMessages: [ChatMessageModal] = ChatMessageModal.mocks
     @State private var avatarmodel: AvatarModal? = AvatarModal.mock
     @State private var textFieldText: String = ""
@@ -16,8 +17,8 @@ struct ChatDetailsView: View {
     @State private var showAlert: AnyAppAlert?
     @State private var showConfirmation: AnyAppAlert?
     @State private var showProfileModal: Bool = false
-
     var avatarId: String = AvatarModal.mock.avatarId
+    
     var body: some View {
         VStack(spacing: 0) {
             scrollViewSection
@@ -25,6 +26,9 @@ struct ChatDetailsView: View {
         }
         .onAppear {
             UIScrollView.appearance().delaysContentTouches = false
+        }
+        .task {
+           await loadAvtar()
         }
         .navigationTitle(avatarmodel?.name ?? "Chat")
         .navigationBarTitleDisplayMode(.inline)
@@ -157,10 +161,22 @@ struct ChatDetailsView: View {
     private func hideProfileModalScreen() {
         showProfileModal = false
     }
+    
+    fileprivate func loadAvtar() async {
+        do {
+            avatarmodel = try await avatarManager.getAvatarById(avatarId: avatarId)
+            if let avatarmodel {
+                try? avatarManager.addRecentAvatar(avatarModel: avatarmodel)
+            }
+        } catch {
+            print("Error loading avatar: \(error)")
+        }
+    }
 }
 
 #Preview {
     NavigationStack {
         ChatDetailsView()
+            .environment(AvatarManager(service: MockAvatarService()))
     }
 }

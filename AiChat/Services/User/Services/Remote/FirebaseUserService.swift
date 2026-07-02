@@ -7,8 +7,6 @@
 
 import FirebaseFirestore
 
-
-
 struct FirebaseUserService: RemoteUserService {
     
     var collection: CollectionReference {

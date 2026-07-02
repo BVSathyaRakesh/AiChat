@@ -10,34 +10,48 @@ import SwiftUI
 @Observable
 class AvatarManager {
 
-    private let service: AvatarService
+    private let remote: RemoteAvatarService
+    private let local: LocalAvatarPersistance
 
-    init(service: AvatarService) {
-        self.service = service
+    init(service: RemoteAvatarService, local: LocalAvatarPersistance = MockLocalAvatarPersistance()) {
+        self.remote = service
+        self.local = local
+    }
+    
+    func addRecentAvatar(avatarModel: AvatarModal) throws {
+        try local.addRecentAvatar(avatarModel: avatarModel)
+    }
+    
+    func getRecentAvatars() async throws -> [AvatarModal] {
+        try local.getRecentAvtars()
     }
 
     func saveAvatarData(avatarModel: AvatarModal) async throws {
-        try await service.createAvatar(avatar: avatarModel)
+        try await remote.createAvatar(avatar: avatarModel)
     }
 
     func fetchUserAvatars(userId: String) async throws -> [AvatarModal] {
-        return try await service.fetchUserAvatarsForAuthor(userId: userId)
+        return try await remote.fetchUserAvatarsForAuthor(userId: userId)
+    }
+
+    func getAvatarById(avatarId: String) async throws -> AvatarModal {
+        return try await remote.getAvatarById(avatarId: avatarId)
     }
 
     func fetchFeaturedAvatars(limit: Int = 20) async throws -> [AvatarModal] {
-        return try await service.fetchFeaturedAvatars(limit: limit)
+        return try await remote.fetchFeaturedAvatars(limit: limit)
     }
 
     func fetchPopularAvatars(limit: Int = 20) async throws -> [AvatarModal] {
-        return try await service.fetchPopularAvatars(limit: limit)
+        return try await remote.fetchPopularAvatars(limit: limit)
     }
     
     func getAvatarForCategory(catergory: CharecterOption) async throws -> [AvatarModal] {
-        return try await service.getAvatarsForcategory(category: catergory)
+        return try await remote.getAvatarsForcategory(category: catergory)
     }
 
     func deleteAvatar(avatarId: String) async throws {
-        try await service.deleteAvatar(avatarId: avatarId)
+        try await remote.deleteAvatar(avatarId: avatarId)
     }
 
 }

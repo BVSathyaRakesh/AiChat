@@ -7,7 +7,6 @@
 
 import SwiftUI
 
-
 protocol AuthService {
     func getAuthenticatedUser() -> UserAuthInfo?
     func getAuthenticatedUserRefreshed() async throws -> UserAuthInfo?

@@ -8,10 +8,8 @@
 import Foundation
 
 struct MockAIService: AIService {
-
     func generateImage(input: String) async throws -> String {
         try await Task.sleep(for: .seconds(2))
         return Constants.randomImage
     }
-
 }
