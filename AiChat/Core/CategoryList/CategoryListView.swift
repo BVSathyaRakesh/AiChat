@@ -9,9 +9,10 @@ import SwiftUI
 
 struct CategoryListView: View {
 
+    @Environment(AvatarManager.self) private var avatarManager
     var category: CharecterOption  = .alien
     var imageName: String = Constants.randomImage
-    @State private var avatars: [AvatarModal] = AvatarModal.mocks
+    @State private var avatars: [AvatarModal] = []
     @Binding var path: [NavigationPathOption]
 
     var body: some View {
@@ -39,8 +40,18 @@ struct CategoryListView: View {
         .listStyle(.plain)
         .navigationTitle(category.plural.capitalized)
         .navigationBarTitleDisplayMode(.inline)
+        .task {
+            await loadData()
+        }
     }
 
+    private func loadData() async {
+        do {
+           avatars = try await avatarManager.getAvatarForCategory(catergory: category)
+        } catch {
+            print("Error fetching avatars:\(error)")
+        }
+    }
     private func onAvatarPressed(avatar: AvatarModal) {
         path.append(.chat(avatarId: avatar.avatarId))
     }
@@ -49,5 +60,6 @@ struct CategoryListView: View {
 #Preview {
     NavigationStack {
         CategoryListView(path: .constant([]))
+            .environment(AvatarManager(service: MockAvatarService()))
     }
 }

@@ -9,22 +9,34 @@ import SwiftUI
 
 struct ExploreView: View {
     
+    @Environment(AvatarManager.self) private var avatarManager
     let avatar = AvatarModal.mock
-    @State var featuredAvatars: [AvatarModal] = AvatarModal.mocks
+    @State var featuredAvatars: [AvatarModal] = []
     @State var catergories: [CharecterOption] = CharecterOption.allCases
-    @State var popularAvatars: [AvatarModal] = AvatarModal.mocks
+    @State var popularAvatars: [AvatarModal] = []
     @State var path: [NavigationPathOption] = []
     
     var body: some View {
         NavigationStack(path: $path) {
             List {
-                featuredSection
-                    .listRowSeparator(.hidden)
-                    .listRowBackground(Color.clear)
-                categoriesSection
-                    .listRowSeparator(.hidden)
-                    .listRowBackground(Color.clear)
-                popularSection
+                if featuredAvatars.isEmpty && popularAvatars.isEmpty {
+                    ProgressView()
+                        .padding(20)
+                        .listRowSeparator(.hidden)
+                        .frame(maxWidth: .infinity)
+                        .removeListRowFormatting()
+                }
+                if !featuredAvatars.isEmpty {
+                    featuredSection
+                        .listRowSeparator(.hidden)
+                        .listRowBackground(Color.clear)
+                }
+                if !popularAvatars.isEmpty {
+                    categoriesSection
+                        .listRowSeparator(.hidden)
+                        .listRowBackground(Color.clear)
+                    popularSection
+                }
             }
             .listStyle(.plain)
             .scrollContentBackground(.hidden)
@@ -34,7 +46,12 @@ struct ExploreView: View {
                 UIScrollView.appearance().delaysContentTouches = false
             }
             .navigationDestinationForModule(path: $path)
-
+         }
+        .task {
+            await featuredAvatars()
+        }
+        .task {
+            await popularAvatars()
         }
     }
     
@@ -66,7 +83,7 @@ struct ExploreView: View {
                             let imageName = popularAvatars.first(where: { $0.charcterOption == item})?.profileImageName
                             if let imageName {
                                 CategoryCellView(
-                                    title: item.rawValue.capitalized,
+                                    title: item.plural.capitalized,
                                     imageName: imageName
                                 )
                                 .anyButton {
@@ -124,8 +141,27 @@ struct ExploreView: View {
     private func onCategoryPressed(category: CharecterOption, imageName: String) {
         path.append(.category(category: category, imageName: imageName))
     }
+    
+    private func featuredAvatars() async {
+        guard featuredAvatars.isEmpty else { return }
+        do {
+           featuredAvatars = try await avatarManager.fetchFeaturedAvatars(limit: 5)
+        } catch {
+            print("Error fetching avatars: \(error)")
+        }
+    }
+
+    private func popularAvatars() async {
+        guard popularAvatars.isEmpty else { return }
+        do {
+           popularAvatars = try await avatarManager.fetchPopularAvatars(limit: 5)
+        } catch {
+            print("Error fetching avatars: \(error)")
+        }
+    }
 }
 
 #Preview {
     ExploreView()
+        .environment(AvatarManager(service: MockAvatarService()))
 }

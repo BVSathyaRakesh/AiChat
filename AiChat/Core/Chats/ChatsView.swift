@@ -9,14 +9,19 @@ import SwiftUI
 
 struct ChatsView: View {
 
-    @State var avatars: [AvatarModal] = AvatarModal.mocks
+    @Environment(AvatarManager.self) private var avatarManager
+    @State var avatars: [AvatarModal] = []
     @State var chats: [ChatModal] = ChatModal.mocks
     @State var path: [NavigationPathOption] = []
+    @State private var isLoadingAvatars = false
+    @State private var alert: AnyAppAlert?
 
     var body: some View {
         NavigationStack(path: $path) {
             List {
-                if !avatars.isEmpty {
+                if isLoadingAvatars {
+                    loadingAvatarsSection
+                } else if !avatars.isEmpty {
                     recentAvatarsSection
                 }
                 chatSection
@@ -28,8 +33,22 @@ struct ChatsView: View {
                 UIScrollView.appearance().delaysContentTouches = false
             }
         }
+        .showCustomAlert(alert: $alert)
+        .task {
+            await loadRecentAvatars()
+        }
     }
     
+    private var loadingAvatarsSection: some View {
+        Section {
+            ProgressView()
+                .frame(maxWidth: .infinity, alignment: .center)
+                .removeListRowFormatting()
+        } header: {
+            Text("Recents")
+        }
+    }
+
     private var emptyAvatarsSection: some View {
         Text("Your Recent Avatars will appear here!")
             .foregroundStyle(.secondary)
@@ -103,8 +122,21 @@ struct ChatsView: View {
             Text("Chats")
         }
     }
+
+    private func loadRecentAvatars() async {
+        isLoadingAvatars = true
+        defer { isLoadingAvatars = false }
+
+        do {
+            // TODO: Replace with actual user ID when authentication is implemented
+            avatars = try await avatarManager.fetchUserAvatars(userId: "current_user_id")
+        } catch {
+            alert = AnyAppAlert(error: error)
+        }
+    }
 }
 
 #Preview {
     ChatsView()
+        .environment(AvatarManager(service: MockAvatarService()))
 }

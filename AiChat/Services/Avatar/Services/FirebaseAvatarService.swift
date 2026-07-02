@@ -1,0 +1,61 @@
+//
+//  FirebaseAvatarService.swift
+//  AiChat
+//
+//  Created by Sathya Kumar on 02/07/26.
+//
+
+import FirebaseFirestore
+
+extension QuerySnapshot {
+    func decode<T: Decodable>(as type: T.Type) throws -> [T] {
+        return try documents.compactMap { try $0.data(as: type) }
+    }
+}
+
+struct FirebaseAvatarService: AvatarService {
+
+    var collection: CollectionReference {
+        Firestore.firestore().collection("avatars")
+    }
+
+    func createAvatar(avatar: AvatarModal) async throws {
+        try collection.document(avatar.avatarId).setData(from: avatar, merge: true)
+    }
+
+    func fetchUserAvatarsForAuthor(userId: String) async throws -> [AvatarModal] {
+        let snapshot = try await collection
+            .whereField(AvatarModal.CodingKeys.authorId.rawValue, isEqualTo: userId)
+            .getDocuments()
+
+        return try snapshot.decode(as: AvatarModal.self)
+    }
+
+    func fetchFeaturedAvatars(limit: Int = 20) async throws -> [AvatarModal] {
+        let snapshot = try await collection
+            .limit(to: limit)
+            .getDocuments()
+
+        return try snapshot.decode(as: AvatarModal.self)
+    }
+
+    func fetchPopularAvatars(limit: Int = 200) async throws -> [AvatarModal] {
+        let snapshot = try await collection
+            .limit(to: limit)
+            .getDocuments()
+
+        return try snapshot.decode(as: AvatarModal.self)
+    }
+    
+    func getAvatarsForcategory(category: CharecterOption) async throws -> [AvatarModal] {
+        let snapshot = try await collection
+            .whereField(AvatarModal.CodingKeys.charcterOption.rawValue, isEqualTo: category.rawValue)
+            .getDocuments()
+
+        return try snapshot.decode(as: AvatarModal.self)
+    }
+
+    func deleteAvatar(avatarId: String) async throws {
+        try await collection.document(avatarId).delete()
+    }
+}

@@ -8,6 +8,7 @@
 import SwiftUI
 import SDWebImageSwiftUI
 
+@MainActor
 struct ImageLoaderView: View {
 
     var urlString = Constants.randomImage
@@ -31,11 +32,15 @@ struct ImageLoaderView: View {
                             .frame(maxWidth: .infinity, maxHeight: .infinity)
                     }
                     .onSuccess { _, _, _ in
-                        imageLoadFailed = false
+                        Task {
+                            imageLoadFailed = false
+                        }
                     }
                     .onFailure { error in
                         print("Image loading failed: \(error.localizedDescription)")
-                        imageLoadFailed = true
+                        Task {
+                            imageLoadFailed = true
+                        }
                     }
                     .indicator(.activity)
                     .allowsHitTesting(false)
