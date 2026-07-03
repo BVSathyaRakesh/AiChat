@@ -30,6 +30,10 @@ struct MockAvatarService: RemoteAvatarService {
     func fetchPopularAvatars(limit: Int) async throws -> [AvatarModal] {
         return Array(AvatarModal.mocks.prefix(limit))
     }
+
+    func fetchAllAvatars(limit: Int) async throws -> [AvatarModal] {
+        return Array(AvatarModal.mocks.prefix(limit))
+    }
     
     func getAvatarsForcategory(category: CharecterOption) async throws -> [AvatarModal] {
         return Array(AvatarModal.mocks.prefix(1))
@@ -37,5 +41,9 @@ struct MockAvatarService: RemoteAvatarService {
     
     func deleteAvatar(avatarId: String) async throws {
         print("Mock: Deleted avatar \(avatarId)")
+    }
+
+    func incrementClickCount(avatarId: String) async throws {
+        print("Mock: Incremented click count for avatar \(avatarId)")
     }
 }

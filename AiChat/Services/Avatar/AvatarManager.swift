@@ -18,8 +18,9 @@ class AvatarManager {
         self.local = local
     }
     
-    func addRecentAvatar(avatarModel: AvatarModal) throws {
+    func addRecentAvatar(avatarModel: AvatarModal) async throws {
         try local.addRecentAvatar(avatarModel: avatarModel)
+        try await remote.incrementClickCount(avatarId: avatarModel.avatarId)
     }
     
     func getRecentAvatars() async throws -> [AvatarModal] {
@@ -45,6 +46,10 @@ class AvatarManager {
     func fetchPopularAvatars(limit: Int = 20) async throws -> [AvatarModal] {
         return try await remote.fetchPopularAvatars(limit: limit)
     }
+
+    func fetchAllAvatars(limit: Int = 20) async throws -> [AvatarModal] {
+        return try await remote.fetchAllAvatars(limit: limit)
+    }
     
     func getAvatarForCategory(catergory: CharecterOption) async throws -> [AvatarModal] {
         return try await remote.getAvatarsForcategory(category: catergory)
@@ -52,6 +57,10 @@ class AvatarManager {
 
     func deleteAvatar(avatarId: String) async throws {
         try await remote.deleteAvatar(avatarId: avatarId)
+    }
+
+    func incrementClickCount(avatarId: String) async throws {
+        try await remote.incrementClickCount(avatarId: avatarId)
     }
 
 }

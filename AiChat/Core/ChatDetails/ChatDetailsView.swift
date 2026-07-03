@@ -166,7 +166,7 @@ struct ChatDetailsView: View {
         do {
             avatarmodel = try await avatarManager.getAvatarById(avatarId: avatarId)
             if let avatarmodel {
-                try? avatarManager.addRecentAvatar(avatarModel: avatarmodel)
+                try?  await avatarManager.addRecentAvatar(avatarModel: avatarmodel)
             }
         } catch {
             print("Error loading avatar: \(error)")

@@ -13,13 +13,14 @@ struct ExploreView: View {
     let avatar = AvatarModal.mock
     @State var featuredAvatars: [AvatarModal] = []
     @State var catergories: [CharecterOption] = CharecterOption.allCases
+    @State var categoryAvatars: [AvatarModal] = []
     @State var popularAvatars: [AvatarModal] = []
     @State var path: [NavigationPathOption] = []
     
     var body: some View {
         NavigationStack(path: $path) {
             List {
-                if featuredAvatars.isEmpty && popularAvatars.isEmpty {
+                if featuredAvatars.isEmpty && categoryAvatars.isEmpty && popularAvatars.isEmpty {
                     ProgressView()
                         .padding(20)
                         .listRowSeparator(.hidden)
@@ -31,10 +32,12 @@ struct ExploreView: View {
                         .listRowSeparator(.hidden)
                         .listRowBackground(Color.clear)
                 }
-                if !popularAvatars.isEmpty {
+                if !categoryAvatars.isEmpty {
                     categoriesSection
                         .listRowSeparator(.hidden)
                         .listRowBackground(Color.clear)
+                }
+                if !popularAvatars.isEmpty {
                     popularSection
                 }
             }
@@ -49,6 +52,9 @@ struct ExploreView: View {
          }
         .task {
             await featuredAvatars()
+        }
+        .task {
+            await categoryAvatars()
         }
         .task {
             await popularAvatars()
@@ -80,7 +86,7 @@ struct ExploreView: View {
                 ScrollView(.horizontal) {
                     HStack {
                         ForEach(catergories, id: \.self) { item in
-                            let imageName = popularAvatars.first(where: { $0.charcterOption == item})?.profileImageName
+                            let imageName = categoryAvatars.last(where: { $0.charcterOption == item})?.profileImageName
                             if let imageName {
                                 CategoryCellView(
                                     title: item.plural.capitalized,
@@ -98,7 +104,7 @@ struct ExploreView: View {
                 .scrollTargetLayout()
                 .scrollTargetBehavior(.viewAligned)
             }
-            
+
         } header: {
             Text("Categoreis")
         }
@@ -117,7 +123,7 @@ struct ExploreView: View {
                     .contentShape(Rectangle())
                     .anyButton(.highlight) {
                         onCategoryPressed(category: avatar.charcterOption ?? .alien, imageName: avatar.profileImageName ?? Constants.randomImage)
-                        
+
                     }
                     if index < popularAvatars.count - 1 {
                         Divider()
@@ -149,6 +155,15 @@ struct ExploreView: View {
            featuredAvatars = try await avatarManager.fetchFeaturedAvatars(limit: 5)
         } catch {
             print("Error fetching avatars: \(error)")
+        }
+    }
+
+    private func categoryAvatars() async {
+        guard categoryAvatars.isEmpty else { return }
+        do {
+           categoryAvatars = try await avatarManager.fetchAllAvatars(limit: 200)
+        } catch {
+            print("Error fetching category avatars: \(error)")
         }
     }
 

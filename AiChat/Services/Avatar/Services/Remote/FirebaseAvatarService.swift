@@ -28,7 +28,10 @@ struct FirebaseAvatarService: RemoteAvatarService {
             .whereField(AvatarModal.CodingKeys.authorId.rawValue, isEqualTo: userId)
             .getDocuments()
 
-        return try snapshot.decode(as: AvatarModal.self)
+        let avatars = try snapshot.decode(as: AvatarModal.self)
+        return avatars.sorted {
+            ($0.dateCreated ?? .distantPast) > ($1.dateCreated ?? .distantPast)
+        }
     }
     
     func getAvatarById(avatarId: String) async throws -> AvatarModal {
@@ -53,6 +56,16 @@ struct FirebaseAvatarService: RemoteAvatarService {
 
     func fetchPopularAvatars(limit: Int = 200) async throws -> [AvatarModal] {
         let snapshot = try await collection
+            .whereField(AvatarModal.CodingKeys.clickCount.rawValue, isGreaterThan: 0)
+            .order(by: AvatarModal.CodingKeys.clickCount.rawValue, descending: true)
+            .limit(to: limit)
+            .getDocuments()
+
+        return try snapshot.decode(as: AvatarModal.self)
+    }
+
+    func fetchAllAvatars(limit: Int = 200) async throws -> [AvatarModal] {
+        let snapshot = try await collection
             .limit(to: limit)
             .getDocuments()
 
@@ -69,5 +82,11 @@ struct FirebaseAvatarService: RemoteAvatarService {
 
     func deleteAvatar(avatarId: String) async throws {
         try await collection.document(avatarId).delete()
+    }
+
+    func incrementClickCount(avatarId: String) async throws {
+        try await collection.document(avatarId).updateData([
+            AvatarModal.CodingKeys.clickCount.rawValue: FieldValue.increment(Int64(1))
+        ])
     }
 }

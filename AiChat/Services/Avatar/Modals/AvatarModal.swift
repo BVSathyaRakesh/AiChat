@@ -16,6 +16,7 @@ struct AvatarModal: Codable, Hashable {
     let profileImageName: String?
     let authorId: String?
     let dateCreated: Date?
+    let clickCount: Int?
     
     init(
         avatarId: String,
@@ -25,7 +26,8 @@ struct AvatarModal: Codable, Hashable {
         charcetrLocation: CharcterLocation? = nil,
         profileImageName: String? = nil,
         authorId: String? = nil,
-        dateCreated: Date? = nil
+        dateCreated: Date? = nil,
+        clickCount: Int? = nil
     ) {
         self.avatarId = avatarId
         self.name = name
@@ -35,6 +37,7 @@ struct AvatarModal: Codable, Hashable {
         self.profileImageName = profileImageName
         self.authorId = authorId
         self.dateCreated = dateCreated
+        self.clickCount = clickCount
     }
     
     enum CodingKeys: String, CodingKey {
@@ -46,6 +49,7 @@ struct AvatarModal: Codable, Hashable {
         case profileImageName = "profile_image_name"
         case authorId = "author_id"
         case dateCreated = "date_created"
+        case clickCount = "click_count"
     }
     
     var charecterDescription: String {
@@ -57,10 +61,10 @@ struct AvatarModal: Codable, Hashable {
     }
     
     static var mocks: [AvatarModal] = [
-        AvatarModal(avatarId: UUID().uuidString, name: "Alpha", charcterOption: .alien, charcterAction: .smiling, charcetrLocation: .park, profileImageName: Constants.randomImage, authorId: UUID().uuidString, dateCreated: .now),
-        AvatarModal(avatarId: UUID().uuidString, name: "Beta", charcterOption: .dog, charcterAction: .eating, charcetrLocation: .city, profileImageName: Constants.randomImage, authorId: UUID().uuidString, dateCreated: .now),
-        AvatarModal(avatarId: UUID().uuidString, name: "Gama", charcterOption: .cat, charcterAction: .drinking, charcetrLocation: .desert, profileImageName: Constants.randomImage, authorId: UUID().uuidString, dateCreated: .now),
-        AvatarModal(avatarId: UUID().uuidString, name: "Delta", charcterOption: .woman, charcterAction: .fighting, charcetrLocation: .musem, profileImageName: Constants.randomImage, authorId: UUID().uuidString, dateCreated: .now),
-        AvatarModal(avatarId: UUID().uuidString, name: "Alpha1", charcterOption: .man, charcterAction: .relaxing, charcetrLocation: .mall, profileImageName: Constants.randomImage, authorId: UUID().uuidString, dateCreated: .now)
+        AvatarModal(avatarId: UUID().uuidString, name: "Alpha", charcterOption: .alien, charcterAction: .smiling, charcetrLocation: .park, profileImageName: Constants.randomImage, authorId: UUID().uuidString, dateCreated: .now, clickCount: 0),
+        AvatarModal(avatarId: UUID().uuidString, name: "Beta", charcterOption: .dog, charcterAction: .eating, charcetrLocation: .city, profileImageName: Constants.randomImage, authorId: UUID().uuidString, dateCreated: .now, clickCount: 0),
+        AvatarModal(avatarId: UUID().uuidString, name: "Gama", charcterOption: .cat, charcterAction: .drinking, charcetrLocation: .desert, profileImageName: Constants.randomImage, authorId: UUID().uuidString, dateCreated: .now, clickCount: 0),
+        AvatarModal(avatarId: UUID().uuidString, name: "Delta", charcterOption: .woman, charcterAction: .fighting, charcetrLocation: .musem, profileImageName: Constants.randomImage, authorId: UUID().uuidString, dateCreated: .now, clickCount: 0),
+        AvatarModal(avatarId: UUID().uuidString, name: "Alpha1", charcterOption: .man, charcterAction: .relaxing, charcetrLocation: .mall, profileImageName: Constants.randomImage, authorId: UUID().uuidString, dateCreated: .now, clickCount: 0)
     ]
 }

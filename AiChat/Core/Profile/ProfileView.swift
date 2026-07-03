@@ -38,14 +38,18 @@ struct ProfileView: View {
                     profileButton
                 }
             }
-            
         }
         .sheet(isPresented: $showSettings) {
            SettingsView()
         }
-        .fullScreenCover(isPresented: $createNewAvatarView) {
+        .fullScreenCover(isPresented: $createNewAvatarView, onDismiss: {
+            Task {
+               await loadData()
+            }
+        }, content: {
             CreateAvatarView()
-        }
+        })
+        
     }
     
     private var userProfileSection: some View {
@@ -146,19 +150,15 @@ struct ProfileView: View {
     private func loadData() async {
         isLoading = true
         user = userManager.currentuser
-
         do {
             let uid = try authManager.getAuthId()
-
             // Fetch user's avatars from Firestore
             myAVatars = try await avatarManager.fetchUserAvatars(userId: uid)
-
             print("✅ Loaded \(myAVatars.count) avatars")
         } catch {
             print("❌ Error loading avatars: \(error.localizedDescription)")
             myAVatars = []
         }
-
         isLoading = false
     }
 }
