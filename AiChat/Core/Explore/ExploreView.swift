@@ -16,29 +16,50 @@ struct ExploreView: View {
     @State var categoryAvatars: [AvatarModal] = []
     @State var popularAvatars: [AvatarModal] = []
     @State var path: [NavigationPathOption] = []
+    @State private var isLoading: Bool = false
+    @State private var errorMessage: String?
     
     var body: some View {
         NavigationStack(path: $path) {
             List {
-                if featuredAvatars.isEmpty && categoryAvatars.isEmpty && popularAvatars.isEmpty {
+                if let errorMessage {
+                    EmptyStateView(
+                        title: "Error",
+                        message: errorMessage,
+                        buttonTitle: "Try again"
+                    ) {
+                        retryLoadData()
+                    }
+                    .listRowSeparator(.hidden)
+                    .removeListRowFormatting()
+                } else if isLoading {
                     ProgressView()
                         .padding(20)
                         .listRowSeparator(.hidden)
                         .frame(maxWidth: .infinity)
                         .removeListRowFormatting()
-                }
-                if !featuredAvatars.isEmpty {
-                    featuredSection
+                } else {
+                    if !featuredAvatars.isEmpty {
+                        featuredSection
+                            .listRowSeparator(.hidden)
+                            .listRowBackground(Color.clear)
+                    }
+                    if !categoryAvatars.isEmpty {
+                        categoriesSection
+                            .listRowSeparator(.hidden)
+                            .listRowBackground(Color.clear)
+                    }
+                    if !popularAvatars.isEmpty {
+                        popularSection
+                    }
+                    if featuredAvatars.isEmpty && categoryAvatars.isEmpty && popularAvatars.isEmpty {
+                        EmptyStateView(
+                            title: "No Avatars",
+                            message: "There are no avatars available at the moment."
+                        )
                         .listRowSeparator(.hidden)
-                        .listRowBackground(Color.clear)
-                }
-                if !categoryAvatars.isEmpty {
-                    categoriesSection
-                        .listRowSeparator(.hidden)
-                        .listRowBackground(Color.clear)
-                }
-                if !popularAvatars.isEmpty {
-                    popularSection
+                        .removeListRowFormatting()
+                    }
                 }
             }
             .listStyle(.plain)
@@ -51,13 +72,7 @@ struct ExploreView: View {
             .navigationDestinationForModule(path: $path)
          }
         .task {
-            await featuredAvatars()
-        }
-        .task {
-            await categoryAvatars()
-        }
-        .task {
-            await popularAvatars()
+            await loadAllData()
         }
     }
     
@@ -149,35 +164,45 @@ struct ExploreView: View {
         path.append(.category(category: category, imageName: imageName))
     }
     
-    private func featuredAvatars() async {
-        guard featuredAvatars.isEmpty else { return }
+    private func loadAllData() async {
+        guard !isLoading else { return }
+        isLoading = true
+        errorMessage = nil
+
         do {
-           featuredAvatars = try await avatarManager.fetchFeaturedAvatars(limit: 5)
+            async let featured = avatarManager.fetchFeaturedAvatars(limit: 5)
+            async let category = avatarManager.fetchAllAvatars(limit: 200)
+            async let popular = avatarManager.fetchPopularAvatars(limit: 5)
+
+            featuredAvatars = try await featured
+            categoryAvatars = try await category
+            popularAvatars = try await popular
         } catch {
+            errorMessage = "Please check your internet connection\nand try again."
             print("Error fetching avatars: \(error)")
         }
+
+        isLoading = false
     }
 
-    private func categoryAvatars() async {
-        guard categoryAvatars.isEmpty else { return }
-        do {
-           categoryAvatars = try await avatarManager.fetchAllAvatars(limit: 200)
-        } catch {
-            print("Error fetching category avatars: \(error)")
-        }
-    }
-
-    private func popularAvatars() async {
-        guard popularAvatars.isEmpty else { return }
-        do {
-           popularAvatars = try await avatarManager.fetchPopularAvatars(limit: 5)
-        } catch {
-            print("Error fetching avatars: \(error)")
+    private func retryLoadData() {
+        Task {
+            await loadAllData()
         }
     }
 }
 
-#Preview {
+#Preview("Loaded - With Data") {
     ExploreView()
-        .environment(AvatarManager(service: MockAvatarService()))
+        .previewEnvironment(delay: 0.5)
+}
+
+#Preview("Error - No Connection") {
+    ExploreView()
+        .previewEnvironment(shouldFail: true, delay: 1.0)
+}
+
+#Preview("Empty - No Data") {
+    ExploreView()
+        .previewEnvironment(isEmpty: true, delay: 0.5)
 }

@@ -72,3 +72,19 @@ struct Dependencies {
         )
     }
 }
+
+extension View {
+    func previewEnvironment(
+        isSignedIn: Bool = true,
+        shouldFail: Bool = false,
+        isEmpty: Bool = false,
+        delay: CGFloat = 0
+    ) -> some View {
+        self
+            .environment(AIManager(aiService: MockAIService()))
+            .environment(AvatarManager(service: MockAvatarService(shouldFail: shouldFail, isEmpty: isEmpty, delay: delay)))
+            .environment(UserManager(services: MockUserServices(userModal: isSignedIn ? .mock : nil)))
+            .environment(AuthManager(authService: MockAuthService(user: isSignedIn ? .mock() : nil)))
+            .environment(AppState())
+    }
+}

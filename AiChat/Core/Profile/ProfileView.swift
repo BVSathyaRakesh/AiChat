@@ -17,6 +17,7 @@ struct ProfileView: View {
     @State private var createNewAvatarView: Bool = false
     @State private var myAVatars: [AvatarModal] = []
     @State private var isLoading: Bool = true
+    @State private var hasError: Bool = false
     @State var path: [NavigationPathOption] = []
   
     var body: some View {
@@ -66,20 +67,38 @@ struct ProfileView: View {
     
     private var myAvatarSection: some View {
         Section {
-            if myAVatars.isEmpty {
-                Group {
-                    if isLoading {
-                        ProgressView()
-                    } else {
-                        Text("Click + To Create Your First Avatar")
-                            .padding()
-                            .frame(maxWidth: .infinity)
+            if hasError {
+                VStack(spacing: 12) {
+                    HStack(spacing: 8) {
+                        Text("No Avatars Found")
+                            .font(.headline)
+                        Text("😢")
+                            .font(.system(size: 20))
                     }
                 }
                 .padding(50)
                 .frame(maxWidth: .infinity)
-                .font(.body)
-                .foregroundStyle(.secondary)
+                .removeListRowFormatting()
+            } else if myAVatars.isEmpty {
+                Group {
+                    if isLoading {
+                        ProgressView()
+                    } else {
+                        VStack(spacing: 12) {
+                            Text("🤖")
+                                .font(.system(size: 60))
+                            Text("No Avatars Found")
+                                .font(.headline)
+                            Text("Click + To Create Your First Avatar")
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
+                        }
+                        .padding()
+                        .frame(maxWidth: .infinity)
+                    }
+                }
+                .padding(50)
+                .frame(maxWidth: .infinity)
                 .removeListRowFormatting()
             } else {
                 ForEach(myAVatars, id: \.self) { avatar in
@@ -97,7 +116,7 @@ struct ProfileView: View {
                     onDeleteAvtar(indexSet: indexset)
                 }
             }
-            
+
         } header: {
            headerText
         }
@@ -149,6 +168,7 @@ struct ProfileView: View {
 
     private func loadData() async {
         isLoading = true
+        hasError = false
         user = userManager.currentuser
         do {
             let uid = try authManager.getAuthId()
@@ -156,17 +176,31 @@ struct ProfileView: View {
             myAVatars = try await avatarManager.fetchUserAvatars(userId: uid)
             print("✅ Loaded \(myAVatars.count) avatars")
         } catch {
+            hasError = true
             print("❌ Error loading avatars: \(error.localizedDescription)")
             myAVatars = []
         }
         isLoading = false
     }
+
+    private func retryLoadData() {
+        Task {
+            await loadData()
+        }
+    }
 }
 
-#Preview {
+#Preview("Loaded - With Data") {
     ProfileView()
-        .environment(AppState())
-        .environment(UserManager(services: MockUserServices(userModal: .mock)))
-        .environment(AvatarManager(service: MockAvatarService()))
-        .environment(AuthManager(authService: MockAuthService(user: .mock())))
+        .previewEnvironment(delay: 0.5)
+}
+
+#Preview("Error - No Connection") {
+    ProfileView()
+        .previewEnvironment(shouldFail: true, delay: 1.0)
+}
+
+#Preview("Empty - No Data") {
+    ProfileView()
+        .previewEnvironment(isEmpty: true, delay: 0.5)
 }
