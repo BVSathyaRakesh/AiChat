@@ -59,7 +59,9 @@ struct CorouselView<Content: View, T: Hashable>: View {
     }
     
     private func updateSelectionIfNeeded() {
-        if selection == nil || selection == items.last {
+        if selection == nil {
+            selection = items.first
+        } else if let currentSelection = selection, !items.contains(currentSelection) {
             selection = items.first
         }
     }

@@ -19,6 +19,9 @@ struct ProfileView: View {
     @State private var isLoading: Bool = true
     @State private var hasError: Bool = false
     @State var path: [NavigationPathOption] = []
+    @State private var showDeleteAlert: Bool = false
+    @State private var resultAlert: AnyAppAlert?
+    @State private var avatarToDelete: (index: Int, avatar: AvatarModal)?
   
     var body: some View {
         NavigationStack(path: $path) {
@@ -50,7 +53,32 @@ struct ProfileView: View {
         }, content: {
             CreateAvatarView()
         })
-        
+        .overlay {
+            if showDeleteAlert, let toDelete = avatarToDelete {
+                ZStack {
+                    Color.black.opacity(0.3)
+                        .ignoresSafeArea()
+                        .onTapGesture {
+                            showDeleteAlert = false
+                            avatarToDelete = nil
+                        }
+
+                    CustomDeleteAlert(
+                        title: "Delete Avatar",
+                        message: "Are you sure you want to delete \"\(toDelete.avatar.name ?? "this avatar")\"?",
+                        deleteAction: {
+                            showDeleteAlert = false
+                            performDelete()
+                        },
+                        cancelAction: {
+                            showDeleteAlert = false
+                            avatarToDelete = nil
+                        }
+                    )
+                }
+            }
+        }
+        .showCustomAlert(type: .alert, alert: $resultAlert)
     }
     
     private var userProfileSection: some View {
@@ -154,15 +182,30 @@ struct ProfileView: View {
     private func onDeleteAvtar(indexSet: IndexSet) {
         guard let index = indexSet.first else { return }
         let avatar = myAVatars[index]
+        avatarToDelete = (index, avatar)
+        showDeleteAlert = true
+    }
+
+    private func performDelete() {
+        guard let toDelete = avatarToDelete else { return }
 
         Task {
             do {
-                try await avatarManager.deleteAvatar(avatarId: avatar.avatarId)
-                myAVatars.remove(at: index)
+                try await avatarManager.deleteAvatar(avatarId: toDelete.avatar.avatarId)
+                myAVatars.remove(at: toDelete.index)
+
+                resultAlert = AnyAppAlert(
+                    title: "Success",
+                    subtitle: "Avatar deleted successfully"
+                )
+
                 print("✅ Avatar deleted successfully")
             } catch {
+                resultAlert = AnyAppAlert(error: error)
                 print("❌ Error deleting avatar: \(error.localizedDescription)")
             }
+
+            avatarToDelete = nil
         }
     }
 
