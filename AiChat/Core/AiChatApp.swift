@@ -68,7 +68,7 @@ struct Dependencies {
         aiImanager = AIManager(aiService: PollinationsAIService())
         avatarManager = AvatarManager(
             service: FirebaseAvatarService(),
-            local: SwiftDataLocalAvatarPersistance()
+            local: SwiftDataLocalAvatarPersistence()
         )
     }
 }

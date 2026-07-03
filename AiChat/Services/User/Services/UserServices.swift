@@ -9,22 +9,22 @@ import Foundation
 
 protocol UserServices {
     var remote: RemoteUserService { get }
-    var local: LocalUserPersistance { get }
+    var local: LocalUserPersistence { get }
 }
 
 struct ProductionUserServices: UserServices {
     var remote: RemoteUserService
-    var local: LocalUserPersistance
+    var local: LocalUserPersistence
     
     init(userModal: UserModel? = nil) {
         self.remote = FirebaseUserService()
-        self.local  = FileManagerUserPersistance()
+        self.local  = FileManagerUserPersistence()
     }
 }
 
 struct MockUserServices: UserServices {
     var remote: RemoteUserService
-    var local: LocalUserPersistance
+    var local: LocalUserPersistence
     
     init(userModal: UserModel? = nil) {
         self.local = MockLoclUserPersistence(user: userModal)

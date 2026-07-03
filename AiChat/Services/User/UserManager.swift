@@ -13,7 +13,7 @@ import FirebaseFirestore
 @Observable
 class UserManager: UserServices {
     
-    internal let local: LocalUserPersistance
+    internal let local: LocalUserPersistence
     internal let remote: RemoteUserService
     private(set) var currentuser: UserModel?
     private var listener: AnyObject?

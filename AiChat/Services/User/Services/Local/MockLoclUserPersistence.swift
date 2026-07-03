@@ -5,7 +5,7 @@
 //  Created by Sathya Kumar on 30/06/26.
 //
 
-struct MockLoclUserPersistence: LocalUserPersistance {
+struct MockLoclUserPersistence: LocalUserPersistence {
     
     let currentUser: UserModel?
 

@@ -1,12 +1,12 @@
 //
-//  FileManagerUserPersistance.swift
+//  FileManagerUserPersistence.swift
 //  AiChat
 //
 //  Created by Sathya Kumar on 30/06/26.
 //
 import Foundation
 
-struct FileManagerUserPersistance: LocalUserPersistance {
+struct FileManagerUserPersistence: LocalUserPersistence {
     
     private let documentKey = "user-data"
     
