@@ -12,15 +12,22 @@ struct Constants {
     static var privacyPolicyURL = "https://www.apple.com/"
     static var termsOfServiceURL = "https://www.apple.com/"
 
-    // AI Image Generation
+    // AI Generation
     struct AIConstants {
-        static let pollinationsBaseURL = "https://image.pollinations.ai/prompt/"
+        static let pollinationsImageBaseURL = "https://image.pollinations.ai/prompt/"
+        static let pollinationsTextBaseURL = "https://text.pollinations.ai/"
+        static let pollinationsTextAPIURL = "https://text.pollinations.ai/"
         static let defaultImageWidth = 512
         static let defaultImageHeight = 512
 
         static func pollinationsImageURL(prompt: String, width: Int = defaultImageWidth, height: Int = defaultImageHeight, noLogo: Bool = true) -> String {
             let encodedPrompt = prompt.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? prompt
-            return "\(pollinationsBaseURL)\(encodedPrompt)?width=\(width)&height=\(height)&nologo=\(noLogo)"
+            return "\(pollinationsImageBaseURL)\(encodedPrompt)?width=\(width)&height=\(height)&nologo=\(noLogo)"
+        }
+
+        static func pollinationsTextURL(prompt: String) -> String {
+            let encodedPrompt = prompt.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? prompt
+            return "\(pollinationsTextBaseURL)\(encodedPrompt)"
         }
     }
 }

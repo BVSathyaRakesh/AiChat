@@ -16,7 +16,7 @@ struct ChatBubbleViewBuilder: View {
     
     var body: some View {
         ChatBubbleView(
-            text: message.content ?? "",
+            text: message.content?.content ?? "",
             textColor: isCurrentuser ? .white : .primary,
             backgroundColor: isCurrentuser ? .accent : Color(
                 uiColor: .systemGray5
@@ -38,7 +38,7 @@ struct ChatBubbleViewBuilder: View {
                     id: UUID().uuidString,
                     chatId: UUID().uuidString,
                     authorId: UUID().uuidString,
-                    content: "This is some longer text that goes here on multiple lines and keeps going to another line!",
+                    content: .assistant("This is some longer text that goes here on multiple lines and keeps going to another line!"),
                     seenByIds: nil,
                     dateCreated: .now
                 )
@@ -50,7 +50,7 @@ struct ChatBubbleViewBuilder: View {
                     id: UUID().uuidString,
                     chatId: UUID().uuidString,
                     authorId: UUID().uuidString,
-                    content: "This is some longer text that goes here on multiple lines and keeps going to another line!",
+                    content: .user("This is some longer text that goes here on multiple lines and keeps going to another line!"),
                     seenByIds: nil,
                     dateCreated: .now
                 ), isCurrentuser: true

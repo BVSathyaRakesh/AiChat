@@ -36,12 +36,12 @@ struct ChatRowCellViewBuilder: View {
         if isLoading {
             return "xxxx xxxx xxxx xxxx"
         }
-        
+
         if avatar == nil && lastMessage == nil {
             return "Error"
         }
-        
-        return lastMessage?.content ?? "No Messages Yet!"
+
+        return lastMessage?.content?.content ?? "No Messages Yet!"
     }
     
     var body: some View {

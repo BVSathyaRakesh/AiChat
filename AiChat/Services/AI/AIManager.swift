@@ -19,4 +19,12 @@ class AIManager: AIService {
         return try await aiService.generateImage(input: input)
     }
 
+    func generateText(input: String) async throws -> String {
+        return try await aiService.generateText(input: input)
+    }
+
+    func generateTextWithContext(messages: [AIChatModel], systemPrompt: String? = nil) async throws -> String {
+        return try await aiService.generateTextWithContext(messages: messages, systemPrompt: systemPrompt)
+    }
+
 }
