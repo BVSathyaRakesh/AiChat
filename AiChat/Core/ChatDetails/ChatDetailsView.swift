@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import FirebaseFirestore
 
 struct ChatDetailsView: View {
 
@@ -23,6 +24,7 @@ struct ChatDetailsView: View {
     @State private var showProfileModal: Bool = false
     @State private var isSendingMessage = false
     @State private var currentuser: UserModel?
+    @State private var messageListener: ListenerRegistration?
     var avatarId: String = AvatarModal.mock.avatarId
 
     init(avatarId: String = AvatarModal.mock.avatarId, initialMessages: [ChatMessageModal] = []) {
@@ -40,6 +42,13 @@ struct ChatDetailsView: View {
         }
         .task {
            await loadAvtar()
+        }
+        .task {
+            await loadChatData()
+        }
+        .onDisappear {
+            messageListener?.remove()
+            messageListener = nil
         }
         .navigationTitle(avatarmodel?.name ?? "Chat")
         .navigationBarTitleDisplayMode(.inline)
@@ -141,8 +150,13 @@ struct ChatDetailsView: View {
                 if chat == nil {
                     // craete a new chat
                    chat = try await createNewChat(uid: userId)
+
+                   // Start listening for real-time updates on the new chat
+                   if let newChat = chat {
+                       startMessageListener(chatId: newChat.id)
+                   }
                 }
-                
+
                 // If chat is nil, throw error should never happen
                 guard let chat  else {
                     throw ChatError.noChatFound
@@ -153,13 +167,11 @@ struct ChatDetailsView: View {
 
                 // Add user message immediately and clear text field
                 let message = ChatMessageModal.createUserMessage(chatId: chat.id, authorId: userId, text: userMessage)
-                
+
                 // upload user chat
                 try await chatManager.addChatMessage(chatId: chat.id, message: message)
-                chatMessages.append(message)
-                // clear textfield & scroll to bottom
+                // clear textfield (listener will update UI and scroll)
                 textFieldText = ""
-                scrollPosition = message.id
 
                 // Build conversation history
                 let conversationHistory = buildConversationHistory()
@@ -179,7 +191,7 @@ struct ChatDetailsView: View {
                 // Generate AI response (without character personality)
                 let aiResponse = try await aiManager.generateTextWithContext(
                     messages: conversationHistory,
-                    systemPrompt: nil
+                    systemPrompt: buildSystemPrompt()
                 )
 
                 // Remove typing indicator
@@ -187,10 +199,8 @@ struct ChatDetailsView: View {
 
                 // Add actual AI response
                 let aiMessage = ChatMessageModal.createAssistantMessage(chatId: chat.id, authorId: avatarId, text: aiResponse)
-                // upload Ai chat
+                // upload Ai chat (listener will update UI and scroll)
                 try await chatManager.addChatMessage(chatId: chat.id, message: aiMessage)
-                chatMessages.append(aiMessage)
-                scrollPosition = aiMessage.id
 
             } catch {
                 showAlert = AnyAppAlert(error: error)
@@ -207,12 +217,40 @@ struct ChatDetailsView: View {
         try await chatManager.createNewChat(chat: newChat)
         return newChat
     }
-    
+
+    private func startMessageListener(chatId: String) {
+        // Remove any existing listener first
+        messageListener?.remove()
+
+        // Start listening for real-time updates
+        messageListener = chatManager.observeChatMessages(chatId: chatId) { [self] updatedMessages in
+            chatMessages = updatedMessages
+            // Auto-scroll to latest message
+            if let lastMessage = updatedMessages.last {
+                scrollPosition = lastMessage.id
+            }
+        }
+    }
+
     private func buildConversationHistory() -> [AIChatModel] {
         // Get last 10 messages for context
         let recentMessages = chatMessages.suffix(10)
         return recentMessages.compactMap { $0.content }
     }
+    
+    private func buildSystemPrompt() -> String {
+            guard let avatar = avatarmodel else {
+                return "You are a helpful AI assistant. Be friendly and conversational."
+            }
+
+            return """
+            You are \(avatar.name ?? "an AI character"). \(avatar.charecterDescription)
+
+            Respond in character, staying true to your personality and background.
+            Be engaging, friendly, and conversational.
+            Keep responses concise and natural.
+            """
+        }
 
     private func showConfirmationDialog() {
         showConfirmation = AnyAppAlert(
@@ -254,6 +292,34 @@ struct ChatDetailsView: View {
             }
         } catch {
             print("Error loading avatar: \(error)")
+        }
+    }
+
+    private func loadChatData() async {
+        do {
+            // Get current user ID
+            let userId = try authManager.getAuthId()
+
+            // Build chat ID based on the pattern: userId_avatarId
+            let chatId = "\(userId)_\(avatarId)"
+
+            // Try to fetch existing chat
+            chat = try await chatManager.getChat(chatId: chatId)
+
+            // If chat exists, load messages and start listening
+            if chat != nil {
+                let messages = try await chatManager.getChatMessages(chatId: chatId)
+                chatMessages = messages
+                // Scroll to latest message
+                if let lastMessage = messages.last {
+                    scrollPosition = lastMessage.id
+                }
+
+                // Start listening for real-time updates
+                startMessageListener(chatId: chatId)
+            }
+        } catch {
+            print("Error loading chat data: \(error)")
         }
     }
 }

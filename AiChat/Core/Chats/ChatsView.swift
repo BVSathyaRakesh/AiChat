@@ -10,10 +10,13 @@ import SwiftUI
 struct ChatsView: View {
 
     @Environment(AvatarManager.self) private var avatarManager
+    @Environment(ChatManager.self) private var chatManager
+    @Environment(AuthManager.self) private var authManager
     @State var avatars: [AvatarModal] = []
-    @State var chats: [ChatModal] = ChatModal.mocks
+    @State var chats: [ChatModal] = []
     @State var path: [NavigationPathOption] = []
     @State private var isLoadingAvatars = false
+    @State private var isLoadingChats = false
     @State private var alert: AnyAppAlert?
 
     var body: some View {
@@ -36,6 +39,7 @@ struct ChatsView: View {
         .showCustomAlert(alert: $alert)
         .task {
             await loadRecentAvatars()
+            await loadChats()
         }
     }
     
@@ -93,7 +97,11 @@ struct ChatsView: View {
     
     private var chatSection: some View {
         Section {
-            if chats.isEmpty {
+            if isLoadingChats {
+                ProgressView()
+                    .frame(maxWidth: .infinity, alignment: .center)
+                    .removeListRowFormatting()
+            } else if chats.isEmpty {
                 Text("Your chats will appear here!")
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
@@ -102,15 +110,13 @@ struct ChatsView: View {
             } else {
                 ForEach(chats, id: \.self) { chat in
                     ChatRowCellViewBuilder(
-                        currentUserId: nil,
+                        currentUserId: try? authManager.getAuthId(),
                         chat: chat,
                         getAvatar: {
-                            try? await Task.sleep(for: .seconds(1))
-                            return AvatarModal.mocks.randomElement()!
+                            try? await avatarManager.getAvatarById(avatarId: chat.avatarId)
                         },
                         getLastMessage: {
-                            try? await Task.sleep(for: .seconds(1))
-                            return ChatMessageModal.mocks.randomElement()!
+                            try? await chatManager.getLastMessage(chatId: chat.id)
                         }
                     )
                     .anyButton(.highlight) {
@@ -133,10 +139,21 @@ struct ChatsView: View {
             alert = AnyAppAlert(error: error)
         }
     }
+
+    private func loadChats() async {
+        isLoadingChats = true
+        defer { isLoadingChats = false }
+
+        do {
+            let userId = try authManager.getAuthId()
+            chats = try await chatManager.getUserChats(userId: userId)
+        } catch {
+            alert = AnyAppAlert(error: error)
+        }
+    }
 }
 
 #Preview {
     ChatsView()
-        .environment(AvatarManager(service: MockAvatarService()))
         .previewEnvironment()
 }
