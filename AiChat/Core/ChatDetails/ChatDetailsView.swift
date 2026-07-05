@@ -11,7 +11,10 @@ struct ChatDetailsView: View {
 
     @Environment(AvatarManager.self) private var avatarManager
     @Environment(AIManager.self) private var aiManager
+    @Environment(AuthManager.self) private var authManager
+    @Environment(ChatManager.self) private var chatManager
     @State private var chatMessages: [ChatMessageModal]
+    @State private var chat: ChatModal?
     @State private var avatarmodel: AvatarModal? = AvatarModal.mock
     @State private var textFieldText: String = ""
     @State private var scrollPosition: String?
@@ -19,6 +22,7 @@ struct ChatDetailsView: View {
     @State private var showConfirmation: AnyAppAlert?
     @State private var showProfileModal: Bool = false
     @State private var isSendingMessage = false
+    @State private var currentuser: UserModel?
     var avatarId: String = AvatarModal.mock.avatarId
 
     init(avatarId: String = AvatarModal.mock.avatarId, initialMessages: [ChatMessageModal] = []) {
@@ -128,12 +132,27 @@ struct ChatDetailsView: View {
 
             do {
                 try TextValidationHelper.validateTextField(text: textFieldText)
+                let userId = try authManager.getAuthId()
+                
+                if chat == nil {
+                    // craete a new chat
+                    let newChat = ChatModal.new(userId: userId, avatarId: avatarId)
+                    try await chatManager.createNewChat(chat: newChat)
+                    chat = newChat
+                }
 
                 // Save the message text before clearing
                 let userMessage = textFieldText
 
                 // Add user message immediately and clear text field
-                sendMessageText(userMessage)
+                let message = ChatMessageModal.createUserMessage(
+                    chatId: UUID().uuidString,
+                    authorId: "current-user-id",
+                    text: userMessage
+                )
+                chatMessages.append(message)
+                textFieldText = ""
+                scrollPosition = message.id
 
                 // Build conversation history
                 let conversationHistory = buildConversationHistory()
@@ -147,7 +166,13 @@ struct ChatDetailsView: View {
 
                 // Add AI response
                 try await Task.sleep(for: .seconds(0.5))
-                getAiResponse(response: aiResponse)
+                let aiMessage = ChatMessageModal.createAssistantMessage(
+                    chatId: UUID().uuidString,
+                    authorId: avatarId,
+                    text: aiResponse
+                )
+                chatMessages.append(aiMessage)
+                scrollPosition = aiMessage.id
 
             } catch {
                 showAlert = AnyAppAlert(error: error)
@@ -173,33 +198,6 @@ struct ChatDetailsView: View {
         Be engaging, friendly, and conversational.
         Keep responses concise and natural.
         """
-    }
-    
-    private func sendMessageText(_ text: String) {
-        let message = ChatMessageModal(
-            id: UUID().uuidString,
-            chatId: UUID().uuidString,
-            authorId: "current-user-id",
-            content: .user(text),
-            seenByIds: nil,
-            dateCreated: .now
-        )
-        chatMessages.append(message)
-        textFieldText = ""
-        scrollPosition = message.id
-    }
-    
-    private func getAiResponse(response: String) {
-        let messageReply = ChatMessageModal(
-            id: UUID().uuidString,
-            chatId: UUID().uuidString,
-            authorId: avatarId,
-            content: .assistant(response),
-            seenByIds: nil,
-            dateCreated: .now
-        )
-        chatMessages.append(messageReply)
-        scrollPosition = messageReply.id
     }
     
     private func showConfirmationDialog() {

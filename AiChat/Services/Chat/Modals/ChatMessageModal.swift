@@ -29,6 +29,37 @@ struct ChatMessageModal: Identifiable {
         return seenByIds.contains(userId)
     }
 
+    // Factory methods for creating messages
+    static func createUserMessage(
+        chatId: String,
+        authorId: String,
+        text: String
+    ) -> Self {
+        ChatMessageModal(
+            id: UUID().uuidString,
+            chatId: chatId,
+            authorId: authorId,
+            content: .user(text),
+            seenByIds: nil,
+            dateCreated: .now
+        )
+    }
+
+    static func createAssistantMessage(
+        chatId: String,
+        authorId: String,
+        text: String
+    ) -> Self {
+        ChatMessageModal(
+            id: UUID().uuidString,
+            chatId: chatId,
+            authorId: authorId,
+            content: .assistant(text),
+            seenByIds: nil,
+            dateCreated: .now
+        )
+    }
+
     static var mock: ChatMessageModal {
         mocks[0]
     }

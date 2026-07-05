@@ -11,6 +11,7 @@ struct ChatBubbleViewBuilder: View {
     
     var message: ChatMessageModal = ChatMessageModal.mock
     var isCurrentuser: Bool = false
+    var currentuserBackgroundColor: Color = .accent
     var imageName: String?
     var action: (() -> Void)?
     
@@ -18,7 +19,7 @@ struct ChatBubbleViewBuilder: View {
         ChatBubbleView(
             text: message.content?.content ?? "",
             textColor: isCurrentuser ? .white : .primary,
-            backgroundColor: isCurrentuser ? .accent : Color(
+            backgroundColor: isCurrentuser ? currentuserBackgroundColor : Color(
                 uiColor: .systemGray5
             ), showImage: isCurrentuser ? false : true,
             imageName: imageName,
@@ -53,7 +54,8 @@ struct ChatBubbleViewBuilder: View {
                     content: .user("This is some longer text that goes here on multiple lines and keeps going to another line!"),
                     seenByIds: nil,
                     dateCreated: .now
-                ), isCurrentuser: true
+                ), isCurrentuser: true,
+                currentuserBackgroundColor: .blue
             )
         }
         .padding(12)
