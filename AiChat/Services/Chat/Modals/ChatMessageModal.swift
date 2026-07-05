@@ -7,21 +7,29 @@
 
 import Foundation
 
-struct ChatMessageModal: Identifiable {
+struct ChatMessageModal: Identifiable, Codable {
     let id: String
     let chatId: String
     let authorId: String?
     let content: AIChatModel?  // Now stores AIChatModel instead of String
     let seenByIds: [String]?
     let dateCreated: Date
+    
+    enum CodingKeys: String, CodingKey {
+        case id
+        case chatId = "chat_id"
+        case authorId = "author_id"
+        case content
+        case seenByIds = "seen_by_ids"
+        case dateCreated = "date_created"
+    }
 
     var timeAgo: String {
         dateCreated.timeAgoDisplay()
     }
 
-    var isFromCurrentUser: Bool {
-        // This would typically check against actual current user ID
-        authorId == "current-user-id"
+    func isFromCurrentUser(userId: String) -> Bool {
+        return authorId == userId
     }
 
     func hasSeenBy(userId: String) -> Bool {
@@ -64,65 +72,69 @@ struct ChatMessageModal: Identifiable {
         mocks[0]
     }
 
-    static var mocks: [ChatMessageModal] = [
-        // Chat 1 - Recent conversation
-        ChatMessageModal(
-            id: UUID().uuidString,
-            chatId: "chat-1",
-            authorId: "current-user-id",
-            content: .user("Hey! How are you doing today?"),
-            seenByIds: ["avatar-1"],
-            dateCreated: Date().addingTimeInterval(-60 * 30)
-        ),
-        ChatMessageModal(
-            id: UUID().uuidString,
-            chatId: "chat-1",
-            authorId: "avatar-1",
-            content: .assistant("Hello! I'm doing great, thank you for asking. How about you?"),
-            seenByIds: ["current-user-id"],
-            dateCreated: Date().addingTimeInterval(-60 * 25)
-        ),
-        ChatMessageModal(
-            id: UUID().uuidString,
-            chatId: "chat-1",
-            authorId: "current-user-id",
-            content: .user("I'm good! Just exploring this app."),
-            seenByIds: [],
-            dateCreated: Date().addingTimeInterval(-60 * 20)
-        ),
+    static var mocks: [ChatMessageModal] = {
+        let mockUserId = UserAuthInfo.mock().uid
+        let mockAvatarId = AvatarModal.mock.avatarId
+        let chatId = "\(mockUserId)_\(mockAvatarId)"
 
-        // Chat 2 - A few hours ago
-        ChatMessageModal(
-            id: UUID().uuidString,
-            chatId: "chat-2",
-            authorId: "avatar-2",
-            content: .assistant("Good morning! Ready for a new adventure?"),
-            seenByIds: ["current-user-id"],
-            dateCreated: Date().addingTimeInterval(-3600 * 5)
-        ),
-        ChatMessageModal(
-            id: UUID().uuidString,
-            chatId: "chat-2",
-            authorId: "current-user-id",
-            content: .user("Absolutely! What do you have in mind?"),
-            seenByIds: ["avatar-2"],
-            dateCreated: Date().addingTimeInterval(-3600 * 4.5)
-        ),
-        ChatMessageModal(
-            id: UUID().uuidString,
-            chatId: "chat-3",
-            authorId: "avatar-3",
-            content: .assistant("Of course! What do you need help with?"),
-            seenByIds: ["current-user-id"],
-            dateCreated: Date().addingTimeInterval(-86400 * 1.9)
-        ),
-        ChatMessageModal(
-            id: UUID().uuidString,
-            chatId: "chat-3",
-            authorId: "current-user-id",
-            content: .user("I'm trying to understand how this works."),
-            seenByIds: [],
-            dateCreated: Date().addingTimeInterval(-86400 * 1.8)
-        )
-    ]
+        return [
+            // Recent conversation - realistic flow
+            ChatMessageModal(
+                id: UUID().uuidString,
+                chatId: chatId,
+                authorId: mockUserId,
+                content: .user("Hey! How are you doing today?"),
+                seenByIds: [mockAvatarId],
+                dateCreated: Date().addingTimeInterval(-60 * 15)
+            ),
+            ChatMessageModal(
+                id: UUID().uuidString,
+                chatId: chatId,
+                authorId: mockAvatarId,
+                content: .assistant("Hello! I'm doing great, thank you for asking. How about you?"),
+                seenByIds: [mockUserId],
+                dateCreated: Date().addingTimeInterval(-60 * 14)
+            ),
+            ChatMessageModal(
+                id: UUID().uuidString,
+                chatId: chatId,
+                authorId: mockUserId,
+                content: .user("I'm good! Just exploring this app."),
+                seenByIds: [mockAvatarId],
+                dateCreated: Date().addingTimeInterval(-60 * 13)
+            ),
+            ChatMessageModal(
+                id: UUID().uuidString,
+                chatId: chatId,
+                authorId: mockAvatarId,
+                content: .assistant("That's wonderful! I'm here to help you explore and answer any questions you might have. What would you like to know?"),
+                seenByIds: [mockUserId],
+                dateCreated: Date().addingTimeInterval(-60 * 12)
+            ),
+            ChatMessageModal(
+                id: UUID().uuidString,
+                chatId: chatId,
+                authorId: mockUserId,
+                content: .user("Can you tell me what features are available?"),
+                seenByIds: [mockAvatarId],
+                dateCreated: Date().addingTimeInterval(-60 * 10)
+            ),
+            ChatMessageModal(
+                id: UUID().uuidString,
+                chatId: chatId,
+                authorId: mockAvatarId,
+                content: .assistant("Sure! You can chat with various AI characters, create custom avatars, and have engaging conversations. Each character has unique personalities and can help with different topics!"),
+                seenByIds: [],
+                dateCreated: Date().addingTimeInterval(-60 * 9)
+            ),
+            ChatMessageModal(
+                id: UUID().uuidString,
+                chatId: chatId,
+                authorId: mockUserId,
+                content: .user("That sounds amazing! Thanks for explaining."),
+                seenByIds: [],
+                dateCreated: Date().addingTimeInterval(-60 * 5)
+            )
+        ]
+    }()
 }

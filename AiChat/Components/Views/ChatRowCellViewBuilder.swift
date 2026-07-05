@@ -41,7 +41,7 @@ struct ChatRowCellViewBuilder: View {
             return "Error"
         }
 
-        return lastMessage?.content?.content ?? "No Messages Yet!"
+        return lastMessage?.content?.message ?? "No Messages Yet!"
     }
     
     var body: some View {

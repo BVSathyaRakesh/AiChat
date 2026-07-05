@@ -15,26 +15,26 @@ enum AIChatRole: String, Codable {
 
 struct AIChatModel: Codable, Hashable {
     let role: AIChatRole
-    let content: String
+    let message: String
 
     // Convenience initializers
     static func system(_ content: String) -> AIChatModel {
-        AIChatModel(role: .system, content: content)
+        AIChatModel(role: .system, message: content)
     }
 
     static func user(_ content: String) -> AIChatModel {
-        AIChatModel(role: .user, content: content)
+        AIChatModel(role: .user, message: content)
     }
 
     static func assistant(_ content: String) -> AIChatModel {
-        AIChatModel(role: .assistant, content: content)
+        AIChatModel(role: .assistant, message: content)
     }
 
     // Convert to API format for Pollinations
     func toAPIFormat() -> [String: String] {
         return [
             "role": role.rawValue,
-            "content": content
+            "message": message
         ]
     }
 }

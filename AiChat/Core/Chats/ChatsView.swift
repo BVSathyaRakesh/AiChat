@@ -138,4 +138,5 @@ struct ChatsView: View {
 #Preview {
     ChatsView()
         .environment(AvatarManager(service: MockAvatarService()))
+        .previewEnvironment()
 }

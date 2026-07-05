@@ -17,7 +17,7 @@ struct ChatBubbleViewBuilder: View {
     
     var body: some View {
         ChatBubbleView(
-            text: message.content?.content ?? "",
+            text: message.content?.message ?? "",
             textColor: isCurrentuser ? .white : .primary,
             backgroundColor: isCurrentuser ? currentuserBackgroundColor : Color(
                 uiColor: .systemGray5

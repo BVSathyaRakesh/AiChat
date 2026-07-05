@@ -43,11 +43,56 @@ struct ChatModal: Identifiable, Hashable, Codable {
         mocks[0]
     }
 
-    static var mocks: [ChatModal] = [
-        ChatModal(id: "mock-chat_1", userId: UUID().uuidString, avatarId: UUID().uuidString, dateCreated: Date().addingTimeInterval(-60 * 30), dateModified: Date().addingTimeInterval(-60 * 30), hasCreatedNew: false),
-        ChatModal(id: "mock-chat_2", userId: UUID().uuidString, avatarId: UUID().uuidString, dateCreated: Date().addingTimeInterval(-3600 * 5), dateModified: Date().addingTimeInterval(-60 * 30), hasCreatedNew: false),
-        ChatModal(id: "mock-chat_3", userId: UUID().uuidString, avatarId: UUID().uuidString, dateCreated: Date().addingTimeInterval(-86400 * 2), dateModified: Date().addingTimeInterval(-60 * 30), hasCreatedNew: true),
-        ChatModal(id: "mock-chat_4", userId: UUID().uuidString, avatarId: UUID().uuidString, dateCreated: Date().addingTimeInterval(-86400 * 5), dateModified: Date().addingTimeInterval(-60 * 30), hasCreatedNew: false),
-        ChatModal(id: "mock-chat_5", userId: UUID().uuidString, avatarId: UUID().uuidString, dateCreated: Date().addingTimeInterval(-86400 * 10), dateModified: Date().addingTimeInterval(-60 * 30), hasCreatedNew: false)
-    ]
+    static var mocks: [ChatModal] = {
+        let mockUserId = UserAuthInfo.mock().uid
+        let avatars = AvatarModal.mocks
+
+        return [
+            // Recent active chat
+            ChatModal(
+                id: "\(mockUserId)_\(avatars[0].avatarId)",
+                userId: mockUserId,
+                avatarId: avatars[0].avatarId,
+                dateCreated: Date().addingTimeInterval(-60 * 30),
+                dateModified: Date().addingTimeInterval(-60 * 5),
+                hasCreatedNew: false
+            ),
+            // Chat from earlier today
+            ChatModal(
+                id: "\(mockUserId)_\(avatars[1].avatarId)",
+                userId: mockUserId,
+                avatarId: avatars[1].avatarId,
+                dateCreated: Date().addingTimeInterval(-3600 * 5),
+                dateModified: Date().addingTimeInterval(-3600 * 2),
+                hasCreatedNew: false
+            ),
+            // New chat from yesterday
+            ChatModal(
+                id: "\(mockUserId)_\(avatars[2].avatarId)",
+                userId: mockUserId,
+                avatarId: avatars[2].avatarId,
+                dateCreated: Date().addingTimeInterval(-86400 * 1),
+                dateModified: Date().addingTimeInterval(-86400 * 1),
+                hasCreatedNew: true
+            ),
+            // Older chat
+            ChatModal(
+                id: "\(mockUserId)_\(avatars[3].avatarId)",
+                userId: mockUserId,
+                avatarId: avatars[3].avatarId,
+                dateCreated: Date().addingTimeInterval(-86400 * 5),
+                dateModified: Date().addingTimeInterval(-86400 * 4),
+                hasCreatedNew: false
+            ),
+            // Very old chat
+            ChatModal(
+                id: "\(mockUserId)_\(avatars[4].avatarId)",
+                userId: mockUserId,
+                avatarId: avatars[4].avatarId,
+                dateCreated: Date().addingTimeInterval(-86400 * 10),
+                dateModified: Date().addingTimeInterval(-86400 * 9),
+                hasCreatedNew: false
+            )
+        ]
+    }()
 }

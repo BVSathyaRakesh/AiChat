@@ -20,7 +20,7 @@ struct MockAIService: AIService {
 
     func generateTextWithContext(messages: [AIChatModel], systemPrompt: String?) async throws -> String {
         try await Task.sleep(for: .seconds(1))
-        let lastMessage = messages.last?.content ?? "no message"
+        let lastMessage = messages.last?.message ?? "no message"
         return "Mock AI response with context to: \(lastMessage)"
     }
 }

@@ -73,10 +73,11 @@ struct ChatDetailsView: View {
         ScrollView {
             LazyVStack(alignment: .leading) {
                 ForEach(chatMessages) { message in
+                    let isCurrentUser = (try? authManager.getAuthId()) == message.authorId
                     ChatBubbleViewBuilder(
                         message: message,
-                        isCurrentuser: message.isFromCurrentUser,
-                        imageName: message.isFromCurrentUser ? nil : avatarmodel?.profileImageName,
+                        isCurrentuser: isCurrentUser,
+                        imageName: isCurrentUser ? nil : avatarmodel?.profileImageName,
                         action: showProfileModalScreen
                     )
                     .id(message.id)
@@ -131,46 +132,63 @@ struct ChatDetailsView: View {
             defer { isSendingMessage = false }
 
             do {
+                // validate the textfield
                 try TextValidationHelper.validateTextField(text: textFieldText)
+                // get the current user id
                 let userId = try authManager.getAuthId()
                 
+                // If chat is nil  create a new chat
                 if chat == nil {
                     // craete a new chat
-                    let newChat = ChatModal.new(userId: userId, avatarId: avatarId)
-                    try await chatManager.createNewChat(chat: newChat)
-                    chat = newChat
+                   chat = try await createNewChat(uid: userId)
+                }
+                
+                // If chat is nil, throw error should never happen
+                guard let chat  else {
+                    throw ChatError.noChatFound
                 }
 
                 // Save the message text before clearing
                 let userMessage = textFieldText
 
                 // Add user message immediately and clear text field
-                let message = ChatMessageModal.createUserMessage(
-                    chatId: UUID().uuidString,
-                    authorId: "current-user-id",
-                    text: userMessage
-                )
+                let message = ChatMessageModal.createUserMessage(chatId: chat.id, authorId: userId, text: userMessage)
+                
+                // upload user chat
+                try await chatManager.addChatMessage(chatId: chat.id, message: message)
                 chatMessages.append(message)
+                // clear textfield & scroll to bottom
                 textFieldText = ""
                 scrollPosition = message.id
 
                 // Build conversation history
                 let conversationHistory = buildConversationHistory()
 
-                // Generate AI response with context
-                let systemPrompt = buildSystemPrompt()
+                // Add typing indicator bubble
+                let thinkingMessage = ChatMessageModal(
+                    id: "thinking-indicator",
+                    chatId: chat.id,
+                    authorId: avatarId,
+                    content: .assistant("..."),
+                    seenByIds: nil,
+                    dateCreated: .now
+                )
+                chatMessages.append(thinkingMessage)
+                scrollPosition = thinkingMessage.id
+
+                // Generate AI response (without character personality)
                 let aiResponse = try await aiManager.generateTextWithContext(
                     messages: conversationHistory,
-                    systemPrompt: systemPrompt
+                    systemPrompt: nil
                 )
 
-                // Add AI response
-                try await Task.sleep(for: .seconds(0.5))
-                let aiMessage = ChatMessageModal.createAssistantMessage(
-                    chatId: UUID().uuidString,
-                    authorId: avatarId,
-                    text: aiResponse
-                )
+                // Remove typing indicator
+                chatMessages.removeAll(where: { $0.id == "thinking-indicator" })
+
+                // Add actual AI response
+                let aiMessage = ChatMessageModal.createAssistantMessage(chatId: chat.id, authorId: avatarId, text: aiResponse)
+                // upload Ai chat
+                try await chatManager.addChatMessage(chatId: chat.id, message: aiMessage)
                 chatMessages.append(aiMessage)
                 scrollPosition = aiMessage.id
 
@@ -179,27 +197,23 @@ struct ChatDetailsView: View {
             }
         }
     }
+    
+    enum ChatError: Error {
+       case noChatFound
+    }
 
+    private func createNewChat(uid: String) async throws -> ChatModal {
+        let newChat = ChatModal.new(userId: uid, avatarId: avatarId)
+        try await chatManager.createNewChat(chat: newChat)
+        return newChat
+    }
+    
     private func buildConversationHistory() -> [AIChatModel] {
         // Get last 10 messages for context
         let recentMessages = chatMessages.suffix(10)
         return recentMessages.compactMap { $0.content }
     }
 
-    private func buildSystemPrompt() -> String {
-        guard let avatar = avatarmodel else {
-            return "You are a helpful AI assistant. Be friendly and conversational."
-        }
-
-        return """
-        You are \(avatar.name ?? "an AI character"). \(avatar.charecterDescription)
-
-        Respond in character, staying true to your personality and background.
-        Be engaging, friendly, and conversational.
-        Keep responses concise and natural.
-        """
-    }
-    
     private func showConfirmationDialog() {
         showConfirmation = AnyAppAlert(
             title: "",
@@ -256,4 +270,81 @@ struct ChatDetailsView: View {
         ChatDetailsView(initialMessages: [])
             .previewEnvironment()
     }
+}
+
+#Preview("AI Generating Response") {
+    struct PreviewWrapper: View {
+        @State private var messages: [ChatMessageModal]
+
+        init() {
+            let mockUserId = UserAuthInfo.mock().uid
+            let mockAvatarId = AvatarModal.mock.avatarId
+            let chatId = "\(mockUserId)_\(mockAvatarId)"
+
+            _messages = State(initialValue: [
+                ChatMessageModal(
+                    id: UUID().uuidString,
+                    chatId: chatId,
+                    authorId: mockUserId,
+                    content: .user("Hey! How are you doing today?"),
+                    seenByIds: [mockAvatarId],
+                    dateCreated: Date().addingTimeInterval(-60 * 15)
+                ),
+                ChatMessageModal(
+                    id: UUID().uuidString,
+                    chatId: chatId,
+                    authorId: mockAvatarId,
+                    content: .assistant("Hello! I'm doing great, thank you for asking. How about you?"),
+                    seenByIds: [mockUserId],
+                    dateCreated: Date().addingTimeInterval(-60 * 14)
+                ),
+                ChatMessageModal(
+                    id: UUID().uuidString,
+                    chatId: chatId,
+                    authorId: mockUserId,
+                    content: .user("Can you tell me about your features?"),
+                    seenByIds: [],
+                    dateCreated: Date().addingTimeInterval(-5)
+                ),
+                // Placeholder "thinking" message
+                ChatMessageModal(
+                    id: "thinking-placeholder",
+                    chatId: chatId,
+                    authorId: mockAvatarId,
+                    content: .assistant("..."),
+                    seenByIds: [],
+                    dateCreated: .now
+                )
+            ])
+        }
+
+        var body: some View {
+            NavigationStack {
+                ChatDetailsView(initialMessages: messages)
+                    .previewEnvironment()
+                    .task {
+                        // Simulate AI generating for 2 seconds
+                        try? await Task.sleep(for: .seconds(2))
+
+                        // Replace placeholder with actual response
+                        if let index = messages.firstIndex(where: { $0.id == "thinking-placeholder" }) {
+                            let mockUserId = UserAuthInfo.mock().uid
+                            let mockAvatarId = AvatarModal.mock.avatarId
+                            let chatId = "\(mockUserId)_\(mockAvatarId)"
+
+                            messages[index] = ChatMessageModal(
+                                id: UUID().uuidString,
+                                chatId: chatId,
+                                authorId: mockAvatarId,
+                                content: .assistant("I'd be happy to tell you about the features! You can chat with AI characters, create custom avatars, and have engaging conversations on various topics."),
+                                seenByIds: [],
+                                dateCreated: .now
+                            )
+                        }
+                    }
+            }
+        }
+    }
+
+    return PreviewWrapper()
 }
