@@ -37,6 +37,7 @@ struct ChatRowCellView: View {
                     if let subTitle {
                         Text(subTitle)
                             .foregroundStyle(.secondary)
+                            .lineLimit(1)
                     }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)

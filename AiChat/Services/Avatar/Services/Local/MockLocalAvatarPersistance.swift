@@ -6,11 +6,13 @@
 //
 
 struct MockLocalAvatarPersistence: LocalAvatarPersistence {
+    var avatars: [AvatarModal] = AvatarModal.mocks
+
     func addRecentAvatar(avatarModel: AvatarModal) throws {
-        
+
     }
-    
+
     func getRecentAvtars() throws -> [AvatarModal] {
-        return AvatarModal.mocks
+        return avatars
     }
 }

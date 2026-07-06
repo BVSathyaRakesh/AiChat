@@ -136,7 +136,7 @@ struct ProfileView: View {
                         imageName: avatar.profileImageName
                     )
                     .anyButton(.highlight, action: {
-                        path.append(.chat(avatarId: avatar.avatarId))
+                        path.append(.chat(avatarId: avatar.avatarId, chat: nil))
                     })
                     .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
                 }

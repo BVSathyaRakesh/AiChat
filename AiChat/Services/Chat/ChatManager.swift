@@ -39,7 +39,6 @@ struct FirebaseChatMessageService: ChatService {
     func getUserChats(userId: String) async throws -> [ChatModal] {
         let snapshot = try await collection
             .whereField(ChatModal.CodingKeys.userId.rawValue, isEqualTo: userId)
-            .order(by: ChatModal.CodingKeys.dateModified.rawValue, descending: true)
             .getDocuments()
 
         return try snapshot.decode(as: ChatModal.self)
@@ -93,30 +92,44 @@ struct FirebaseChatMessageService: ChatService {
 }
 
 struct MockChatMessageService: ChatService {
+    var chats: [ChatModal] = ChatModal.mocks
+    var delay: CGFloat = 0
+
+    private func simulateDelay() async {
+        if delay > 0 {
+            try? await Task.sleep(for: .seconds(delay))
+        }
+    }
+
     func createNewChat(chat: ChatModal) async throws {
+        await simulateDelay()
         print("Mock: Created chat \(chat.id)")
     }
 
     func getChat(chatId: String) async throws -> ChatModal? {
-        return ChatModal.mocks.first(where: { $0.id == chatId })
+        await simulateDelay()
+        return chats.first(where: { $0.id == chatId })
     }
 
     func getUserChats(userId: String) async throws -> [ChatModal] {
-        return ChatModal.mocks.filter { $0.userId == userId }
-            .sorted { $0.dateModified > $1.dateModified }
+        await simulateDelay()
+        return chats.filter { $0.userId == userId }
     }
 
     func getChatMessages(chatId: String) async throws -> [ChatMessageModal] {
+        await simulateDelay()
         return ChatMessageModal.mocks.filter { $0.chatId == chatId }
     }
 
     func getLastMessage(chatId: String) async throws -> ChatMessageModal? {
+        await simulateDelay()
         return ChatMessageModal.mocks.filter { $0.chatId == chatId }
             .sorted { $0.dateCreated > $1.dateCreated }
             .first
     }
 
     func addChatMessage(chatId: String, message: ChatMessageModal) async throws {
+        await simulateDelay()
         print("Mock: Added message to chat \(chatId)")
     }
 

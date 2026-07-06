@@ -81,7 +81,7 @@ struct ChatsView: View {
                             }
                         }
                         .anyButton {
-                            path.append(.chat(avatarId: avatar.avatarId))
+                            path.append(.chat(avatarId: avatar.avatarId, chat: nil))
                         }
                     }
                     .padding(12)
@@ -120,7 +120,7 @@ struct ChatsView: View {
                         }
                     )
                     .anyButton(.highlight) {
-                        path.append(.chat(avatarId: chat.avatarId))
+                        path.append(.chat(avatarId: chat.avatarId, chat: chat))
                     }
                 }
             }
@@ -146,14 +146,33 @@ struct ChatsView: View {
 
         do {
             let userId = try authManager.getAuthId()
-            chats = try await chatManager.getUserChats(userId: userId)
+            let fetchedChats = try await chatManager.getUserChats(userId: userId)
+            chats = fetchedChats.sortedByKeyPath(\.dateModified, ascending: false)
         } catch {
             alert = AnyAppAlert(error: error)
         }
     }
 }
 
-#Preview {
+#Preview("Has data") {
     ChatsView()
+        .previewEnvironment()
+}
+
+#Preview("No data") {
+    ChatsView()
+        .environment(
+            AvatarManager(
+                service: MockAvatarService(avatars: []),
+                local: MockLocalAvatarPersistence(avatars: [])
+            )
+        )
+        .environment(ChatManager(chatService: MockChatMessageService(chats: [])))
+        .previewEnvironment()
+}
+
+#Preview("Slow loading chats") {
+    ChatsView()
+        .environment(ChatManager(chatService: MockChatMessageService(delay: 5)))
         .previewEnvironment()
 }

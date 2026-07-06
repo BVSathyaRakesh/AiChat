@@ -157,7 +157,7 @@ struct ExploreView: View {
     }
     
     private func onAVatarPressed(avatar: AvatarModal) {
-        path.append(.chat(avatarId: avatar.avatarId))
+        path.append(.chat(avatarId: avatar.avatarId, chat: nil))
     }
     
     private func onCategoryPressed(category: CharecterOption, imageName: String) {

@@ -8,6 +8,7 @@
 import Foundation
 
 struct MockAvatarService: RemoteAvatarService {
+    var avatars: [AvatarModal] = AvatarModal.mocks
     var shouldFail: Bool = false
     var isEmpty: Bool = false
     var delay: CGFloat = 0
@@ -31,7 +32,7 @@ struct MockAvatarService: RemoteAvatarService {
         if shouldFail {
             throw NSError(domain: "Network", code: -1, userInfo: nil)
         }
-        guard let avatar = AvatarModal.mocks.first(where: { $0.avatarId == avatarId }) else {
+        guard let avatar = avatars.first(where: { $0.avatarId == avatarId }) else {
             throw NSError(domain: "AvatarService", code: 404, userInfo: nil)
         }
         return avatar
@@ -42,7 +43,7 @@ struct MockAvatarService: RemoteAvatarService {
         if shouldFail {
             throw NSError(domain: "Network", code: -1, userInfo: nil)
         }
-        return isEmpty ? [] : AvatarModal.mocks
+        return isEmpty ? [] : avatars
     }
 
     func fetchFeaturedAvatars(limit: Int) async throws -> [AvatarModal] {
@@ -50,7 +51,7 @@ struct MockAvatarService: RemoteAvatarService {
         if shouldFail {
             throw NSError(domain: "Network", code: -1, userInfo: nil)
         }
-        return isEmpty ? [] : Array(AvatarModal.mocks.prefix(limit))
+        return isEmpty ? [] : Array(avatars.prefix(limit))
     }
 
     func fetchPopularAvatars(limit: Int) async throws -> [AvatarModal] {
@@ -58,7 +59,7 @@ struct MockAvatarService: RemoteAvatarService {
         if shouldFail {
             throw NSError(domain: "Network", code: -1, userInfo: nil)
         }
-        return isEmpty ? [] : Array(AvatarModal.mocks.prefix(limit))
+        return isEmpty ? [] : Array(avatars.prefix(limit))
     }
 
     func fetchAllAvatars(limit: Int) async throws -> [AvatarModal] {
@@ -66,7 +67,7 @@ struct MockAvatarService: RemoteAvatarService {
         if shouldFail {
             throw NSError(domain: "Network", code: -1, userInfo: nil)
         }
-        return isEmpty ? [] : Array(AvatarModal.mocks.prefix(limit))
+        return isEmpty ? [] : Array(avatars.prefix(limit))
     }
 
     func getAvatarsForcategory(category: CharecterOption) async throws -> [AvatarModal] {
@@ -74,7 +75,7 @@ struct MockAvatarService: RemoteAvatarService {
         if shouldFail {
             throw NSError(domain: "Network", code: -1, userInfo: nil)
         }
-        return isEmpty ? [] : Array(AvatarModal.mocks.prefix(1))
+        return isEmpty ? [] : Array(avatars.prefix(1))
     }
 
     func deleteAvatar(avatarId: String) async throws {
