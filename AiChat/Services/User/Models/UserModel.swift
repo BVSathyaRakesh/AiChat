@@ -65,6 +65,20 @@ struct UserModel: Codable {
         return Color(hex: hex)
     }
 
+    var eventParameters: [String: Any] {
+        let dict: [String: Any?] = [
+            "user_\(CodingKeys.userId.rawValue)": userId,
+            "user_\(CodingKeys.email.rawValue)": email,
+            "user_\(CodingKeys.isAnonymous.rawValue)": isAnonymous,
+            "user_\(CodingKeys.creationDate.rawValue)": creationDate,
+            "user_\(CodingKeys.creationVersion.rawValue)": creationVersion,
+            "user_\(CodingKeys.lastSignInDate.rawValue)": lastSignInDate,
+            "user_\(CodingKeys.didCompleteOnBoarding.rawValue)": didCompleteOnBoarding,
+            "user_\(CodingKeys.profileColorHex.rawValue)": profileColorHex,
+        ]
+        return dict.compactMapValues({ $0 })
+    }
+
     static var mock: Self {
         mocks[0]
     }
@@ -72,8 +86,12 @@ struct UserModel: Codable {
     static var mocks: [UserModel] = [
         // Current user - completed onboarding
         UserModel(
-            userId: "current-user-id",
+            userId: "mock_user_123",
+            email: "hello@swiftful-thinking.com",
+            isAnonymous: false,
             creationDate: Date().addingTimeInterval(-86400 * 30),
+            creationVersion: "1.0.0",
+            lastSignInDate: Date(),
             didCompleteOnBoarding: true,
             profileColorHex: "#4ECDC4"
         ),

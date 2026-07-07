@@ -10,7 +10,9 @@
       "Bash(swiftlint version:*)",
       "Bash(xcodebuild -scheme AiChat -configuration Debug clean build)",
       "Bash(git rm:*)",
-      "Bash(chmod:*)"
+      "Bash(chmod:*)",
+      "Bash(xcodebuild -scheme \"AiChat - Mock\" -configuration Mock clean build)",
+      "Bash(find /Users/satkumar/Documents/Personal/SwiftUI/AiChat -name *.sh -type f)"
     ]
   }
 }

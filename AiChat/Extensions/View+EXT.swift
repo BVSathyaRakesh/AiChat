@@ -22,10 +22,11 @@ extension View {
             .font(.caption)
             .bold()
             .foregroundColor(.white)
-            .padding(.horizontal, 8)
-            .padding(.vertical, 5)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 6)
             .background(Color.blue)
-            .cornerRadius(6)
+            .clipShape(RoundedRectangle(cornerRadius: 8))
+
     }
     
     func tappableBackground() -> some View {

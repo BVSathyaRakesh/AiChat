@@ -44,6 +44,7 @@ class AppDelegate: NSObject, UIApplicationDelegate {
        #else
         config = .production
        #endif
+        config.configure()
         dependecies = Dependencies(configuration: config)
         return true
     }
@@ -55,24 +56,22 @@ class AppDelegate: NSObject, UIApplicationDelegate {
     ) -> Bool {
           #if MOCK
         // Mock build doesn't require Firebase configuration
+        return false
           #elseif DEV
         return GIDSignIn.sharedInstance.handle(url)
           #else
         return GIDSignIn.sharedInstance.handle(url)
           #endif
-           
-        return false
     }
-    
-   
 }
 
 enum BuildConfiguration {
-    case mock,dev,production
+    case mock, dev, production
+    
     func configure() {
         switch self {
         case .mock:
-       // Mock build doesn't require Firebase configuration
+            print("Mock build doesn't require Firebase configuration")
         case .dev:
             registerFireBase()
         case .production:
@@ -80,7 +79,7 @@ enum BuildConfiguration {
         }
     }
     
-    private func registerFireBase(){
+    private func registerFireBase() {
         FirebaseApp.configure()
          // Configure Google Sign-In
         if let clientID = FirebaseApp.app()?.options.clientID {
@@ -131,7 +130,10 @@ extension View {
     ) -> some View {
         self
             .environment(AIManager(aiService: MockAIService()))
-            .environment(AvatarManager(service: MockAvatarService(shouldFail: shouldFail, isEmpty: isEmpty, delay: delay)))
+            .environment(AvatarManager(
+                service: MockAvatarService(shouldFail: shouldFail, isEmpty: isEmpty, delay: delay),
+                local: MockLocalAvatarPersistence()
+            ))
             .environment(UserManager(services: MockUserServices(userModal: isSignedIn ? .mock : nil)))
             .environment(AuthManager(authService: MockAuthService(user: isSignedIn ? .mock() : nil)))
             .environment(ChatManager(chatService: MockChatMessageService()))

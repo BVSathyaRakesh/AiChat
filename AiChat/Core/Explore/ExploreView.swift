@@ -18,6 +18,15 @@ struct ExploreView: View {
     @State var path: [NavigationPathOption] = []
     @State private var isLoading: Bool = false
     @State private var errorMessage: String?
+    @State private var showDevSettings: Bool = false
+
+    private var showSettingsButton: Bool {
+        #if DEV || MOCK
+          return true
+        #else
+         return false
+        #endif
+    }
     
     var body: some View {
         NavigationStack(path: $path) {
@@ -66,11 +75,31 @@ struct ExploreView: View {
             .scrollContentBackground(.hidden)
             .background(Color(uiColor: .systemGroupedBackground))
             .navigationTitle("Explore")
+            .toolbar {
+                if showSettingsButton {
+                    ToolbarItem(placement: .navigationBarLeading) {
+                        HStack {
+                            Text("Dev😜")
+                                .padding()
+                                .background(Color.blue)
+                                .foregroundStyle(.white)
+                                .clipShape(RoundedRectangle(cornerRadius: 4))
+                                .fixedSize()
+                                .anyButton(.pressable) {
+                                    showDevSettings = true
+                                }
+                        }
+                    }
+                }
+             }
             .onAppear {
                 UIScrollView.appearance().delaysContentTouches = false
             }
             .navigationDestinationForModule(path: $path)
          }
+        .sheet(isPresented: $showDevSettings) {
+            DevSettingsView()
+        }
         .task {
             await loadAllData()
         }
@@ -199,7 +228,7 @@ struct ExploreView: View {
 
 #Preview("Error - No Connection") {
     ExploreView()
-        .previewEnvironment(shouldFail: true, delay: 1.0)
+        .previewEnvironment(shouldFail: true, delay: 0.5)
 }
 
 #Preview("Empty - No Data") {
