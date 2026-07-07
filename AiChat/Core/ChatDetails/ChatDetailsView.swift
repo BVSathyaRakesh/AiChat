@@ -28,11 +28,14 @@ struct ChatDetailsView: View {
     @State private var currentuser: UserModel?
     @State private var messageListener: ListenerRegistration?
     @State private var chat: ChatModal?
+    @State private var isPreviewMode = false
     var avatarId: String = AvatarModal.mock.avatarId
 
-    init(avatarId: String = AvatarModal.mock.avatarId, chat: ChatModal? = nil) {
+    init(avatarId: String = AvatarModal.mock.avatarId, chat: ChatModal? = nil, initialMessages: [ChatMessageModal] = [], isPreview: Bool = false) {
         self.avatarId = avatarId
         self._chat = State(initialValue: chat)
+        self._chatMessages = State(initialValue: initialMessages)
+        self._isPreviewMode = State(initialValue: isPreview)
     }
 
     var body: some View {
@@ -363,6 +366,9 @@ struct ChatDetailsView: View {
     }
 
     private func loadChatData() async {
+        // Skip loading in preview mode
+        guard !isPreviewMode else { return }
+
         do {
             // Get current user ID
             let userId = try authManager.getAuthId()
@@ -393,9 +399,33 @@ struct ChatDetailsView: View {
     }
 }
 
-#Preview {
+#Preview("With Messages") {
     NavigationStack {
-        ChatDetailsView()
+        ChatDetailsView(
+            avatarId: AvatarModal.mock.avatarId,
+            chat: ChatModal.mock,
+            initialMessages: ChatMessageModal.previewConversation,
+            isPreview: true
+        )
+        .previewEnvironment()
+    }
+}
+
+#Preview("Empty Chat - No Data") {
+    NavigationStack {
+        ChatDetailsView(initialMessages: [], isPreview: true)
             .previewEnvironment()
+    }
+}
+
+#Preview("AI Generating Response") {
+    NavigationStack {
+        ChatDetailsView(
+            avatarId: AvatarModal.mock.avatarId,
+            chat: ChatModal.mock,
+            initialMessages: ChatMessageModal.previewAIGenerating,
+            isPreview: true
+        )
+        .previewEnvironment()
     }
 }

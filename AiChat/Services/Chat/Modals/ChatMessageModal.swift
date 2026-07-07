@@ -137,4 +137,64 @@ struct ChatMessageModal: Identifiable, Codable {
             )
         ]
     }()
+
+    // Preview-specific mocks
+    static var previewConversation: [ChatMessageModal] {
+        let mockUserId = UserAuthInfo.mock().uid
+        let mockAvatarId = AvatarModal.mock.avatarId
+        let chatId = "\(mockUserId)_\(mockAvatarId)"
+
+        return [
+            ChatMessageModal(
+                id: UUID().uuidString,
+                chatId: chatId,
+                authorId: mockUserId,
+                content: .user("Hello! How are you?"),
+                seenByIds: [mockAvatarId],
+                dateCreated: Date().addingTimeInterval(-120)
+            ),
+            ChatMessageModal(
+                id: UUID().uuidString,
+                chatId: chatId,
+                authorId: mockAvatarId,
+                content: .assistant("Hi! I'm doing great, thanks for asking! How can I help you today?"),
+                seenByIds: [mockUserId],
+                dateCreated: Date().addingTimeInterval(-60)
+            ),
+            ChatMessageModal(
+                id: UUID().uuidString,
+                chatId: chatId,
+                authorId: mockUserId,
+                content: .user("Can you tell me about the weather?"),
+                seenByIds: [],
+                dateCreated: Date()
+            )
+        ]
+    }
+
+    static var previewAIGenerating: [ChatMessageModal] {
+        let mockUserId = UserAuthInfo.mock().uid
+        let mockAvatarId = AvatarModal.mock.avatarId
+        let chatId = "\(mockUserId)_\(mockAvatarId)"
+
+        return [
+            ChatMessageModal(
+                id: UUID().uuidString,
+                chatId: chatId,
+                authorId: mockUserId,
+                content: .user("What's the capital of India?"),
+                seenByIds: [],
+                dateCreated: Date().addingTimeInterval(-5)
+            ),
+            ChatMessageModal(
+                id: "thinking-indicator",
+                chatId: chatId,
+                authorId: mockAvatarId,
+                content: .assistant("..."),
+                seenByIds: [],
+                dateCreated: .now
+            )
+        ]
+    }
 }
+
