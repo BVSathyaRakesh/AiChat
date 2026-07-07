@@ -35,24 +35,16 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         _ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
     ) -> Bool {
-        FirebaseApp.configure()
-
-        // Configure Google Sign-In
-        if let clientID = FirebaseApp.app()?.options.clientID {
-            let config = GIDConfiguration(clientID: clientID)
-            GIDSignIn.sharedInstance.configuration = config
-        }
-        
-        
-       #if MOCK
-        dependecies = Dependencies(configuration: .mock)
-       #elseif DEV
-        dependecies = Dependencies(configuration: .dev)
-       #else
-        dependecies = Dependencies(configuration: .production)
-       #endif
        
-
+     let config: BuildConfiguration
+       #if MOCK
+        config = .mock
+       #elseif DEV
+        config = .dev
+       #else
+        config = .production
+       #endif
+        dependecies = Dependencies(configuration: config)
         return true
     }
 
@@ -61,12 +53,41 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         open url: URL,
         options: [UIApplication.OpenURLOptionsKey: Any] = [:]
     ) -> Bool {
+          #if MOCK
+        // Mock build doesn't require Firebase configuration
+          #elseif DEV
         return GIDSignIn.sharedInstance.handle(url)
+          #else
+        return GIDSignIn.sharedInstance.handle(url)
+          #endif
+           
+        return false
     }
+    
+   
 }
 
 enum BuildConfiguration {
     case mock,dev,production
+    func configure() {
+        switch self {
+        case .mock:
+       // Mock build doesn't require Firebase configuration
+        case .dev:
+            registerFireBase()
+        case .production:
+            registerFireBase()
+        }
+    }
+    
+    private func registerFireBase(){
+        FirebaseApp.configure()
+         // Configure Google Sign-In
+        if let clientID = FirebaseApp.app()?.options.clientID {
+            let config = GIDConfiguration(clientID: clientID)
+            GIDSignIn.sharedInstance.configuration = config
+        }
+    }
 }
 
 struct Dependencies {
