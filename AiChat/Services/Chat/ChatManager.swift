@@ -14,15 +14,23 @@ protocol ChatService {
     func getChatMessages(chatId: String) async throws -> [ChatMessageModal]
     func getLastMessage(chatId: String) async throws -> ChatMessageModal?
     func addChatMessage(chatId: String, message: ChatMessageModal) async throws
+    func deleteChatMessages(chatId: String) async throws
+    func deleteChat(chatId: String) async throws
+    func deleteAllUserChats(userId: String) async throws
+    func reportChat(chatId: String, userId: String) async throws
     func observeChatMessages(chatId: String, onUpdate: @escaping ([ChatMessageModal]) -> Void) -> ListenerRegistration
 }
 
 struct FirebaseChatMessageService: ChatService {
-    
+
     var collection: CollectionReference {
         Firestore.firestore().collection("chats")
     }
-    
+
+    var reportCollection: CollectionReference {
+        Firestore.firestore().collection("chat_reports")
+    }
+
     private func messageCollections(chatId: String) -> CollectionReference {
         collection.document(chatId).collection("messages")
     }
@@ -72,6 +80,11 @@ struct FirebaseChatMessageService: ChatService {
         ])
     }
 
+    func reportChat(chatId: String, userId: String) async throws {
+        let report = ChatReportModel.create(chatId: chatId, userId: userId)
+        try reportCollection.document(report.id).setData(from: report)
+    }
+
     func observeChatMessages(chatId: String, onUpdate: @escaping ([ChatMessageModal]) -> Void) -> ListenerRegistration {
         return messageCollections(chatId: chatId)
             .order(by: ChatMessageModal.CodingKeys.dateCreated.rawValue, descending: false)
@@ -87,6 +100,41 @@ struct FirebaseChatMessageService: ChatService {
 
                 onUpdate(messages)
             }
+    }
+    
+    func deleteChatMessages(chatId: String) async throws {
+        // Get all messages in the subcollection
+        let messagesSnapshot = try await messageCollections(chatId: chatId).getDocuments()
+
+        // Use batch to delete all messages
+        let batch = Firestore.firestore().batch()
+
+        for document in messagesSnapshot.documents {
+            batch.deleteDocument(document.reference)
+        }
+
+        // Commit the batch
+        try await batch.commit()
+    }
+
+    func deleteChat(chatId: String) async throws {
+        // Delete all messages first
+        try await deleteChatMessages(chatId: chatId)
+
+        // Then delete the chat document
+        try await collection.document(chatId).delete()
+    }
+
+    func deleteAllUserChats(userId: String) async throws {
+        // Get all chats for this user
+        let chatsSnapshot = try await collection
+            .whereField(ChatModal.CodingKeys.userId.rawValue, isEqualTo: userId)
+            .getDocuments()
+
+        // Reuse deleteChat logic for each chat
+        for chatDoc in chatsSnapshot.documents {
+            try await deleteChat(chatId: chatDoc.documentID)
+        }
     }
 
 }
@@ -131,6 +179,27 @@ struct MockChatMessageService: ChatService {
     func addChatMessage(chatId: String, message: ChatMessageModal) async throws {
         await simulateDelay()
         print("Mock: Added message to chat \(chatId)")
+    }
+
+    func deleteChatMessages(chatId: String) async throws {
+        await simulateDelay()
+        print("Mock: Deleted all messages in chat \(chatId)")
+    }
+
+    func deleteChat(chatId: String) async throws {
+        await simulateDelay()
+        print("Mock: Deleted chat \(chatId) and all its messages")
+    }
+
+    func deleteAllUserChats(userId: String) async throws {
+        await simulateDelay()
+        let userChats = chats.filter { $0.userId == userId }
+        print("Mock: Deleted \(userChats.count) chats for user \(userId)")
+    }
+
+    func reportChat(chatId: String, userId: String) async throws {
+        await simulateDelay()
+        print("Mock: Reported chat \(chatId) by user \(userId)")
     }
 
     func observeChatMessages(chatId: String, onUpdate: @escaping ([ChatMessageModal]) -> Void) -> ListenerRegistration {
@@ -181,6 +250,22 @@ class ChatManager {
 
     func addChatMessage(chatId: String, message: ChatMessageModal) async throws {
         try await chatService.addChatMessage(chatId: chatId, message: message)
+    }
+
+    func deleteChatMessages(chatId: String) async throws {
+        try await chatService.deleteChatMessages(chatId: chatId)
+    }
+
+    func deleteChat(chatId: String) async throws {
+        try await chatService.deleteChat(chatId: chatId)
+    }
+
+    func deleteAllUserChats(userId: String) async throws {
+        try await chatService.deleteAllUserChats(userId: userId)
+    }
+
+    func reportChat(chatId: String, userId: String) async throws {
+        try await chatService.reportChat(chatId: chatId, userId: userId)
     }
 
     func observeChatMessages(chatId: String, onUpdate: @escaping ([ChatMessageModal]) -> Void) -> ListenerRegistration {

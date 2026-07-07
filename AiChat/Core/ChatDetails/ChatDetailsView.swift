@@ -14,6 +14,7 @@ struct ChatDetailsView: View {
     @Environment(AIManager.self) private var aiManager
     @Environment(AuthManager.self) private var authManager
     @Environment(ChatManager.self) private var chatManager
+    @Environment(\.dismiss) private var dismiss
     @State private var chatMessages: [ChatMessageModal] = []
     @State private var avatarmodel: AvatarModal? = AvatarModal.mock
     @State private var textFieldText: String = ""
@@ -22,6 +23,8 @@ struct ChatDetailsView: View {
     @State private var showConfirmation: AnyAppAlert?
     @State private var showProfileModal: Bool = false
     @State private var isSendingMessage = false
+    @State private var isClearingMessages = false
+    @State private var isReporting = false
     @State private var currentuser: UserModel?
     @State private var messageListener: ListenerRegistration?
     @State private var chat: ChatModal?
@@ -60,7 +63,7 @@ struct ChatDetailsView: View {
                         showConfirmationDialog()
                     }
                     .showCustomAlert(type: .confirmationDialog, alert: $showConfirmation)
-                    .disabled(showProfileModal)
+                    .disabled(showProfileModal || isClearingMessages || isReporting)
             }
         }
         .navigationBarBackButtonHidden(showProfileModal)
@@ -74,6 +77,25 @@ struct ChatDetailsView: View {
                     headline: avatarmodel.charecterDescription,
                     onMarkPressed: { showProfileModal = false }
                 )
+            }
+        }
+        .overlay {
+            if isClearingMessages || isReporting {
+                ZStack {
+                    Color.black.opacity(0.4)
+                        .ignoresSafeArea()
+
+                    VStack(spacing: 16) {
+                        ProgressView()
+                            .scaleEffect(1.5)
+                        Text(isClearingMessages ? "Clearing messages..." : "Reporting chat...")
+                            .foregroundStyle(.white)
+                            .font(.headline)
+                    }
+                    .padding(32)
+                    .background(Color(uiColor: .systemBackground))
+                    .cornerRadius(16)
+                }
             }
         }
     }
@@ -105,7 +127,7 @@ struct ChatDetailsView: View {
         TextField("Say something....", text: $textFieldText)
             .keyboardType(.alphabet)
             .autocorrectionDisabled()
-            .disabled(isSendingMessage)
+            .disabled(isSendingMessage || isClearingMessages || isReporting)
             .padding(12)
             .padding(.trailing, 60)
             .overlay(
@@ -117,7 +139,7 @@ struct ChatDetailsView: View {
                     .anyButton {
                        sendMessage()
                     }
-                    .disabled(isSendingMessage)
+                    .disabled(isSendingMessage || isClearingMessages || isReporting)
                 , alignment: .trailing
              )
             .background(
@@ -262,6 +284,41 @@ struct ChatDetailsView: View {
             """
         }
 
+    fileprivate func onDeleteClicked() {
+        Task {
+            guard let chat else { return }
+
+            isClearingMessages = true
+            defer { isClearingMessages = false }
+
+            do {
+                try await chatManager.deleteChatMessages(chatId: chat.id)
+                // Navigate back to chats view after deletion
+                dismiss()
+            } catch {
+                showAlert = AnyAppAlert(error: error)
+            }
+        }
+    }
+
+    fileprivate func onReportClicked() {
+        Task {
+            guard let chat else { return }
+
+            isReporting = true
+            defer { isReporting = false }
+
+            do {
+                let userId = try authManager.getAuthId()
+                try await chatManager.reportChat(chatId: chat.id, userId: userId)
+                // Show success message
+                showAlert = AnyAppAlert(title: "Reported", subtitle: "Thank you for reporting. We will review this chat.")
+            } catch {
+                showAlert = AnyAppAlert(error: error)
+            }
+        }
+    }
+
     private func showConfirmationDialog() {
         showConfirmation = AnyAppAlert(
             title: "",
@@ -271,11 +328,11 @@ struct ChatDetailsView: View {
                     VStack {
                         Button("Report User / Chat", role: .destructive) {
                             showConfirmation = nil
-                            // Handle report action
+                            onReportClicked()
                         }
-                        Button("Delete Chat", role: .destructive) {
+                        Button("Clear Messages", role: .destructive) {
                             showConfirmation = nil
-                            // Handle delete action
+                            onDeleteClicked()
                         }
                         Button("Cancel", role: .cancel) {
                             showConfirmation = nil

@@ -15,6 +15,7 @@ struct ChatsView: View {
     @State var avatars: [AvatarModal] = []
     @State var chats: [ChatModal] = []
     @State var path: [NavigationPathOption] = []
+    @State private var refreshTrigger = 0
     @State private var isLoadingAvatars = false
     @State private var isLoadingChats = false
     @State private var alert: AnyAppAlert?
@@ -32,12 +33,16 @@ struct ChatsView: View {
             .removeListRowFormatting()
             .navigationDestinationForModule(path: $path)
             .navigationTitle("Chats")
+            .refreshable {
+                await loadRecentAvatars()
+                await loadChats()
+            }
             .onAppear {
                 UIScrollView.appearance().delaysContentTouches = false
             }
         }
         .showCustomAlert(alert: $alert)
-        .task {
+        .task(id: refreshTrigger) {
             await loadRecentAvatars()
             await loadChats()
         }

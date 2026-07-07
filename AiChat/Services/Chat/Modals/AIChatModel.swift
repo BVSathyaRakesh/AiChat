@@ -34,7 +34,7 @@ struct AIChatModel: Codable, Hashable {
     func toAPIFormat() -> [String: String] {
         return [
             "role": role.rawValue,
-            "message": message
+            "content": message
         ]
     }
 }
