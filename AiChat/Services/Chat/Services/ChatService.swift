@@ -15,6 +15,7 @@ protocol ChatService {
     func getChatMessages(chatId: String) async throws -> [ChatMessageModal]
     func getLastMessage(chatId: String) async throws -> ChatMessageModal?
     func addChatMessage(chatId: String, message: ChatMessageModal) async throws
+    func markMessageAsSeen(chatId: String, messageId: String, userId: String) async throws
     func deleteChatMessages(chatId: String) async throws
     func deleteChat(chatId: String) async throws
     func deleteAllUserChats(userId: String) async throws

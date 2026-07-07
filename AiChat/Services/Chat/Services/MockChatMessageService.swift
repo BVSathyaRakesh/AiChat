@@ -49,6 +49,11 @@ struct MockChatMessageService: ChatService {
         print("Mock: Added message to chat \(chatId)")
     }
 
+    func markMessageAsSeen(chatId: String, messageId: String, userId: String) async throws {
+        await simulateDelay()
+        print("Mock: Marked message \(messageId) as seen by user \(userId)")
+    }
+
     func deleteChatMessages(chatId: String) async throws {
         await simulateDelay()
         print("Mock: Deleted all messages in chat \(chatId)")

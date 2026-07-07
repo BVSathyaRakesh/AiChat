@@ -151,7 +151,7 @@ struct ChatMessageModal: Identifiable, Codable {
                 authorId: mockUserId,
                 content: .user("Hello! How are you?"),
                 seenByIds: [mockAvatarId],
-                dateCreated: Date().addingTimeInterval(-120)
+                dateCreated: Date().addingTimeInterval(-60 * 20) // 20 minutes ago
             ),
             ChatMessageModal(
                 id: UUID().uuidString,
@@ -159,7 +159,7 @@ struct ChatMessageModal: Identifiable, Codable {
                 authorId: mockAvatarId,
                 content: .assistant("Hi! I'm doing great, thanks for asking! How can I help you today?"),
                 seenByIds: [mockUserId],
-                dateCreated: Date().addingTimeInterval(-60)
+                dateCreated: Date().addingTimeInterval(-60 * 14) // 14 minutes ago (6 minutes later)
             ),
             ChatMessageModal(
                 id: UUID().uuidString,
@@ -167,7 +167,7 @@ struct ChatMessageModal: Identifiable, Codable {
                 authorId: mockUserId,
                 content: .user("Can you tell me about the weather?"),
                 seenByIds: [],
-                dateCreated: Date()
+                dateCreated: Date().addingTimeInterval(-60 * 2) // 2 minutes ago (12 minutes later)
             )
         ]
     }

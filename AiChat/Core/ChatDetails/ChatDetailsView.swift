@@ -105,16 +105,31 @@ struct ChatDetailsView: View {
     
     private var scrollViewSection: some View {
         ScrollView {
-            LazyVStack(alignment: .leading) {
-                ForEach(chatMessages) { message in
+            LazyVStack(alignment: .leading, spacing: 8) {
+                ForEach(Array(chatMessages.enumerated()), id: \.element.id) { index, message in
                     let isCurrentUser = (try? authManager.getAuthId()) == message.authorId
-                    ChatBubbleViewBuilder(
-                        message: message,
-                        isCurrentuser: isCurrentUser,
-                        imageName: isCurrentUser ? nil : avatarmodel?.profileImageName,
-                        action: showProfileModalScreen
-                    )
+                    let shouldShowTimestamp = shouldShowTimestamp(for: message, at: index)
+
+                    VStack(spacing: 4) {
+                        if shouldShowTimestamp {
+                            Text(formatTimestamp(message.dateCreated))
+                                .font(.caption2)
+                                .foregroundStyle(.secondary)
+                                .frame(maxWidth: .infinity, alignment: isCurrentUser ? .trailing : .leading)
+                                .padding(.vertical, 4)
+                        }
+
+                        ChatBubbleViewBuilder(
+                            message: message,
+                            isCurrentuser: isCurrentUser,
+                            imageName: isCurrentUser ? nil : avatarmodel?.profileImageName,
+                            action: showProfileModalScreen
+                        )
+                    }
                     .id(message.id)
+                    .onAppear {
+                        markMessageAsSeenIfNeeded(message: message, isCurrentUser: isCurrentUser)
+                    }
                  }
             }
             .rotationEffect(.degrees(180))
@@ -272,6 +287,39 @@ struct ChatDetailsView: View {
         let recentMessages = chatMessages.suffix(10)
         return recentMessages.compactMap { $0.content }
     }
+
+    private func shouldShowTimestamp(for message: ChatMessageModal, at index: Int) -> Bool {
+        // Always show for first message
+        guard index > 0 else { return true }
+
+        // Get previous message
+        let previousMessage = chatMessages[index - 1]
+
+        // Show timestamp if time difference is more than 5 minutes
+        let timeDifference = message.dateCreated.timeIntervalSince(previousMessage.dateCreated)
+        return timeDifference > 300 // 5 minutes in seconds
+    }
+
+    private func formatTimestamp(_ date: Date) -> String {
+        let calendar = Calendar.current
+        let now = Date()
+
+        if calendar.isDateInToday(date) {
+            // Today: "Today 10:30 AM"
+            let time = date.formatted(date: .omitted, time: .shortened)
+            return "Today \(time)"
+        } else if calendar.isDateInYesterday(date) {
+            // Yesterday: "Yesterday 10:30 AM"
+            let time = date.formatted(date: .omitted, time: .shortened)
+            return "Yesterday \(time)"
+        } else if calendar.isDate(date, equalTo: now, toGranularity: .weekOfYear) {
+            // This week: "Monday 10:30 AM"
+            return date.formatted(.dateTime.weekday(.wide).hour().minute())
+        } else {
+            // Older: "Oct 7, 2023 10:30 AM"
+            return date.formatted(date: .abbreviated, time: .shortened)
+        }
+    }
     
     private func buildSystemPrompt() -> String {
             guard let avatar = avatarmodel else {
@@ -395,6 +443,24 @@ struct ChatDetailsView: View {
             }
         } catch {
             print("Error loading chat data: \(error)")
+        }
+    }
+
+    private func markMessageAsSeenIfNeeded(message: ChatMessageModal, isCurrentUser: Bool) {
+        // Skip in preview mode
+        guard !isPreviewMode else { return }
+
+        // Only mark messages from other users (not current user's messages)
+        guard !isCurrentUser else { return }
+
+        // Skip if already seen by current user
+        guard let userId = try? authManager.getAuthId(),
+              !message.hasSeenBy(userId: userId),
+              let chatId = chat?.id else { return }
+
+        // Mark as seen in background
+        Task {
+            try? await chatManager.markMessageAsSeen(chatId: chatId, messageId: message.id, userId: userId)
         }
     }
 }

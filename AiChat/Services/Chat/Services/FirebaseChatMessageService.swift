@@ -8,7 +8,6 @@
 import SwiftUI
 import FirebaseFirestore
 
-
 struct FirebaseChatMessageService: ChatService {
 
     var collection: CollectionReference {
@@ -66,6 +65,14 @@ struct FirebaseChatMessageService: ChatService {
         try await collection.document(chatId).updateData([
             ChatModal.CodingKeys.dateModified.rawValue: Date.now
         ])
+    }
+
+    func markMessageAsSeen(chatId: String, messageId: String, userId: String) async throws {
+        try await messageCollections(chatId: chatId)
+            .document(messageId)
+            .updateData([
+                ChatMessageModal.CodingKeys.seenByIds.rawValue: FieldValue.arrayUnion([userId])
+            ])
     }
 
     func reportChat(chatId: String, userId: String) async throws {
