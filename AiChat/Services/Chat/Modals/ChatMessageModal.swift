@@ -197,4 +197,3 @@ struct ChatMessageModal: Identifiable, Codable {
         ]
     }
 }
-

@@ -43,7 +43,15 @@ class AppDelegate: NSObject, UIApplicationDelegate {
             GIDSignIn.sharedInstance.configuration = config
         }
         
-        dependecies = Dependencies()
+        
+       #if MOCK
+        dependecies = Dependencies(configuration: .mock)
+       #elseif DEV
+        dependecies = Dependencies(configuration: .dev)
+       #else
+        dependecies = Dependencies(configuration: .production)
+       #endif
+       
 
         return true
     }
@@ -57,22 +65,39 @@ class AppDelegate: NSObject, UIApplicationDelegate {
     }
 }
 
+enum BuildConfiguration {
+    case mock,dev,production
+}
+
 struct Dependencies {
     let authManager: AuthManager!
     let userManager: UserManager!
     let aiImanager: AIManager!
     let avatarManager: AvatarManager!
     let chatManager: ChatManager!
-
-    init() {
-        authManager = AuthManager(authService: FirebaseAuthService())
-        userManager = UserManager(services: ProductionUserServices())
-        aiImanager = AIManager(aiService: PollinationsAIService())
-        avatarManager = AvatarManager(
-            service: FirebaseAvatarService(),
-            local: SwiftDataLocalAvatarPersistence()
-        )
-        chatManager = ChatManager(chatService: FirebaseChatMessageService())
+    
+    init(configuration: BuildConfiguration) {
+        
+        switch configuration {
+        case .mock:
+            authManager = AuthManager(authService: MockAuthService())
+            userManager = UserManager(services: MockUserServices())
+            aiImanager = AIManager(aiService: MockAIService())
+            avatarManager = AvatarManager(service: MockAvatarService(), local: MockLocalAvatarPersistence())
+            chatManager = ChatManager(chatService: FirebaseChatMessageService())
+        case .dev:
+            authManager = AuthManager(authService: FirebaseAuthService())
+            userManager = UserManager(services: ProductionUserServices())
+            aiImanager = AIManager(aiService: PollinationsAIService())
+            avatarManager = AvatarManager(service: FirebaseAvatarService(), local: SwiftDataLocalAvatarPersistence())
+            chatManager = ChatManager(chatService: FirebaseChatMessageService())
+        case .production:
+            authManager = AuthManager(authService: FirebaseAuthService())
+            userManager = UserManager(services: ProductionUserServices())
+            aiImanager = AIManager(aiService: PollinationsAIService())
+            avatarManager = AvatarManager(service: FirebaseAvatarService(), local: SwiftDataLocalAvatarPersistence())
+            chatManager = ChatManager(chatService: FirebaseChatMessageService())
+        }
     }
 }
 
