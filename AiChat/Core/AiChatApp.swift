@@ -23,6 +23,7 @@ struct AiChatApp: App {
                 .environment(delegate.dependecies.aiImanager)
                 .environment(delegate.dependecies.avatarManager)
                 .environment(delegate.dependecies.chatManager)
+                .environment(delegate.dependecies.logManager)
         }
     }
 }
@@ -95,6 +96,7 @@ struct Dependencies {
     let aiImanager: AIManager!
     let avatarManager: AvatarManager!
     let chatManager: ChatManager!
+    let logManager: LogManager!
     
     init(configuration: BuildConfiguration) {
         
@@ -105,18 +107,27 @@ struct Dependencies {
             aiImanager = AIManager(aiService: MockAIService())
             avatarManager = AvatarManager(service: MockAvatarService(), local: MockLocalAvatarPersistence())
             chatManager = ChatManager(chatService: FirebaseChatMessageService())
+            logManager = LogManager(services: [
+                ConsoleService()
+            ])
         case .dev:
             authManager = AuthManager(authService: FirebaseAuthService())
             userManager = UserManager(services: ProductionUserServices())
             aiImanager = AIManager(aiService: PollinationsAIService())
             avatarManager = AvatarManager(service: FirebaseAvatarService(), local: SwiftDataLocalAvatarPersistence())
             chatManager = ChatManager(chatService: FirebaseChatMessageService())
+            logManager = LogManager(services: [
+                ConsoleService()
+            ])
         case .production:
             authManager = AuthManager(authService: FirebaseAuthService())
             userManager = UserManager(services: ProductionUserServices())
             aiImanager = AIManager(aiService: PollinationsAIService())
             avatarManager = AvatarManager(service: FirebaseAvatarService(), local: SwiftDataLocalAvatarPersistence())
             chatManager = ChatManager(chatService: FirebaseChatMessageService())
+            logManager = LogManager(services: [
+                
+            ])
         }
     }
 }
@@ -138,5 +149,6 @@ extension View {
             .environment(AuthManager(authService: MockAuthService(user: isSignedIn ? .mock() : nil)))
             .environment(ChatManager(chatService: MockChatMessageService()))
             .environment(AppState())
+            .environment(LogManager(services: []))
     }
 }

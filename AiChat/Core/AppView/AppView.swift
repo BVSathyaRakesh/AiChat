@@ -11,6 +11,7 @@ struct AppView: View {
     
     @Environment(AuthManager.self) private var authManager
     @Environment(UserManager.self) private var userManager
+    @Environment(LogManager.self) private var logManager
     @State var appState: AppState = AppState()
     
     var body: some View {
@@ -28,6 +29,10 @@ struct AppView: View {
         .environment(appState)
         .task {
             await checkUserStatus()
+        }
+        .onAppear {
+            logManager.identifyUser(userid: "abc123", name: "nick", email: "hi@hi.com")
+            logManager.addUserproperties(properties: UserModel.mock.eventParameters)
         }
         .onChange(of: appState.showTabBar) { _, showTabBar in
             if !showTabBar {
@@ -68,9 +73,11 @@ struct AppView: View {
     AppView(appState: AppState(showTabBar: true))
         .environment(AuthManager(authService: MockAuthService()))
         .environment(UserManager(services: MockUserServices(userModal: .mock)))
+        .previewEnvironment()
 }
 #Preview("Welcome preview") {
     AppView(appState: AppState(showTabBar: false))
         .environment(AuthManager(authService: MockAuthService()))
         .environment(UserManager(services: MockUserServices(userModal: .mock)))
+        .previewEnvironment()
 }

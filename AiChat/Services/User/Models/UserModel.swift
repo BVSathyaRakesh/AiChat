@@ -74,7 +74,7 @@ struct UserModel: Codable {
             "user_\(CodingKeys.creationVersion.rawValue)": creationVersion,
             "user_\(CodingKeys.lastSignInDate.rawValue)": lastSignInDate,
             "user_\(CodingKeys.didCompleteOnBoarding.rawValue)": didCompleteOnBoarding,
-            "user_\(CodingKeys.profileColorHex.rawValue)": profileColorHex,
+            "user_\(CodingKeys.profileColorHex.rawValue)": profileColorHex
         ]
         return dict.compactMapValues({ $0 })
     }
