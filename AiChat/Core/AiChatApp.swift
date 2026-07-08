@@ -108,7 +108,7 @@ struct Dependencies {
             avatarManager = AvatarManager(service: MockAvatarService(), local: MockLocalAvatarPersistence())
             chatManager = ChatManager(chatService: FirebaseChatMessageService())
             logManager = LogManager(services: [
-                ConsoleService()
+                ConsoleService(printParameters: false)
             ])
         case .dev:
             authManager = AuthManager(authService: FirebaseAuthService())
@@ -149,6 +149,6 @@ extension View {
             .environment(AuthManager(authService: MockAuthService(user: isSignedIn ? .mock() : nil)))
             .environment(ChatManager(chatService: MockChatMessageService()))
             .environment(AppState())
-            .environment(LogManager(services: []))
+            .environment(LogManager(services: [ConsoleService()]))
     }
 }

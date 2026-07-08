@@ -8,12 +8,53 @@
 import SwiftUI
 
 struct AppView: View {
-    
+
     @Environment(AuthManager.self) private var authManager
     @Environment(UserManager.self) private var userManager
     @Environment(LogManager.self) private var logManager
     @State var appState: AppState = AppState()
-    
+
+    enum Event: LoggableEvent {
+        case alpha
+        case beta
+        case gamma
+        case delta
+
+        var eventName: String {
+            switch self {
+            case .alpha, .beta, .gamma:
+                return "Event_Gamma"
+            case .delta:
+                return "Event_Delta"
+            }
+        }
+
+        var parameters: [String: Any]? {
+            switch self {
+            case .alpha, .beta:
+                return [
+                    "aaa": true,
+                    "bbb": 123
+                ]
+            default:
+                return nil
+            }
+        }
+
+        var type: LogType {
+            switch self {
+            case .alpha:
+                return .info
+            case .beta:
+                return .analytic
+            case .gamma:
+                return .warning
+            case .delta:
+                return .severe
+            }
+        }
+    }
+
     var body: some View {
         AppViewBuilder(
             showTabBar: appState.showTabBar,
@@ -33,6 +74,10 @@ struct AppView: View {
         .onAppear {
             logManager.identifyUser(userid: "abc123", name: "nick", email: "hi@hi.com")
             logManager.addUserproperties(properties: UserModel.mock.eventParameters)
+            logManager.trackEvent(event: Event.alpha)
+            logManager.trackEvent(event: Event.beta)
+            logManager.trackScreenEvent(event: Event.gamma)
+            logManager.trackScreenEvent(event: Event.delta)
         }
         .onChange(of: appState.showTabBar) { _, showTabBar in
             if !showTabBar {
@@ -73,11 +118,13 @@ struct AppView: View {
     AppView(appState: AppState(showTabBar: true))
         .environment(AuthManager(authService: MockAuthService()))
         .environment(UserManager(services: MockUserServices(userModal: .mock)))
+        .environment(LogManager(services: [ConsoleService()]))
         .previewEnvironment()
 }
 #Preview("Welcome preview") {
     AppView(appState: AppState(showTabBar: false))
         .environment(AuthManager(authService: MockAuthService()))
         .environment(UserManager(services: MockUserServices(userModal: .mock)))
+        .environment(LogManager(services: [ConsoleService()]))
         .previewEnvironment()
 }
