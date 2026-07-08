@@ -94,16 +94,16 @@ struct ConsoleService: LogService {
 
     func deleteuserProfile() {
         let string = """
-        📈Delete User Profil
+        📈 Delete User Profile
         """
-        print(string)
+        logger.log(level: LogType.info, message: string)
     }
 
     func trackEvent(event: any LoggableEvent) {
         var string = """
-        Track Event: \(event.eventName)
+        Track Event: \(event.type.emoji) \(event.eventName)
         """
-        if  printParameters, let  parameters = event.parameters {
+        if printParameters, let parameters = event.parameters {
             let sortedKeys = parameters.keys.sorted()
             for key in sortedKeys {
                 if let value = parameters[key] {
@@ -111,7 +111,7 @@ struct ConsoleService: LogService {
                 }
             }
         }
-        logger.log(level: LogType.info, message: string)
+        logger.log(level: event.type, message: string)
     }
 
     func trackScreenEvent(event: any LoggableEvent) {

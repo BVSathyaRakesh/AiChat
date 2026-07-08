@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		8A11E9ED2FFE53B800EEA923 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 8A11E9EC2FFE53B800EEA923 /* FirebaseAnalytics */; };
 		8AB854CF2FE16B7500B3391F /* SDWebImageSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 8AB854CE2FE16B7500B3391F /* SDWebImageSwiftUI */; };
 		8AB857282FE6E77D00B3391F /* SwiftfulUtilities in Frameworks */ = {isa = PBXBuildFile; productRef = 8AB857272FE6E77D00B3391F /* SwiftfulUtilities */; };
 		8AB858842FEACC2700B3391F /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 8AB858832FEACC2700B3391F /* FirebaseAuth */; };
@@ -77,6 +78,7 @@
 			files = (
 				8AE388372FEBACBA00E5A9DA /* GoogleSignIn in Frameworks */,
 				8AE3882E2FEB942300E5A9DA /* SignInAppleAsync in Frameworks */,
+				8A11E9ED2FFE53B800EEA923 /* FirebaseAnalytics in Frameworks */,
 				8AB854CF2FE16B7500B3391F /* SDWebImageSwiftUI in Frameworks */,
 				8AE388392FEBACBA00E5A9DA /* GoogleSignInSwift in Frameworks */,
 				8AB858842FEACC2700B3391F /* FirebaseAuth in Frameworks */,
@@ -158,6 +160,7 @@
 				8AE388362FEBACBA00E5A9DA /* GoogleSignIn */,
 				8AE388382FEBACBA00E5A9DA /* GoogleSignInSwift */,
 				8AE388482FEC1C3900E5A9DA /* FirebaseFirestore */,
+				8A11E9EC2FFE53B800EEA923 /* FirebaseAnalytics */,
 			);
 			productName = AiChat;
 			productReference = 8AB853AC2FDF09B400B3391F /* AiChat.app */;
@@ -875,6 +878,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		8A11E9EC2FFE53B800EEA923 /* FirebaseAnalytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8AB858822FEACC2700B3391F /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAnalytics;
+		};
 		8AB854CE2FE16B7500B3391F /* SDWebImageSwiftUI */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 8AB854CD2FE16B7500B3391F /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */;

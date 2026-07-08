@@ -33,6 +33,19 @@ class LogManager {
             service.deleteuserProfile()
         }
     }
+    
+    func trackEvent(eventName: String, parameters: [String: Any]? = nil, type: LogType = .analytic) {
+        let event = AnyLoggableEvent(eventName: eventName, parameters: parameters, type: type)
+        for service in services {
+            service.trackEvent(event: event)
+        }
+    }
+    
+    func trackEvent(event: AnyLoggableEvent) {
+        for service in services {
+            service.trackEvent(event: event)
+        }
+    }
 
     func trackEvent(event: any LoggableEvent) {
         for service in services {

@@ -78,6 +78,14 @@ struct AppView: View {
             logManager.trackEvent(event: Event.beta)
             logManager.trackScreenEvent(event: Event.gamma)
             logManager.trackScreenEvent(event: Event.delta)
+            
+            let event = AnyLoggableEvent(
+                eventName: "My New Event",
+                parameters: UserModel.mock.eventParameters,
+                type: .analytic
+            )
+            logManager.trackEvent(event: event)
+            logManager.trackEvent(eventName: "Another Event is Here")
         }
         .onChange(of: appState.showTabBar) { _, showTabBar in
             if !showTabBar {
