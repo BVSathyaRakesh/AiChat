@@ -106,19 +106,19 @@ struct CategoryListView: View {
     NavigationStack {
         CategoryListView(path: .constant([]))
     }
-    .previewEnvironment(delay: 0.5)
+    .previewEnvironment()
 }
 
 #Preview("Error - No Connection") {
     NavigationStack {
         CategoryListView(path: .constant([]))
     }
-    .previewEnvironment(shouldFail: true, delay: 1.0)
+    .previewEnvironment()
 }
 
 #Preview("Empty - No Data") {
     NavigationStack {
         CategoryListView(path: .constant([]))
     }
-    .previewEnvironment(isEmpty: true, delay: 0.5)
+    .previewEnvironment()
 }

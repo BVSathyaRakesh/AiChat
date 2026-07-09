@@ -8,6 +8,9 @@
 import SwiftUI
 
 struct TabBarView: View {
+    
+    @Environment(Dependencies.self) private var dependencies
+    
     var body: some View {
         TabView {
             ExploreView()
@@ -18,9 +21,9 @@ struct TabBarView: View {
                 .tabItem {
                     Label("Chats", systemImage: "bubble.left.and.bubble.right")
                 }
-            ProfileView()
+            ProfileView(viewModel: dependencies.makeProfileViewModel())
                 .tabItem {
-                    Label("Profile", systemImage: "person.fill")
+                    Label("Profile", systemImage: "person.circle")
                 }
         }
     }

@@ -15,38 +15,44 @@ struct AiChatApp: App {
 
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
 
+    // Get Dependencies from AppDelegate (scheme-based configuration)
+    var dependencies: Dependencies {
+        delegate.dependencies
+    }
+
     var body: some Scene {
         WindowGroup {
-                AppView()
-                .environment(delegate.dependecies.authManager)
-                .environment(delegate.dependecies.userManager)
-                .environment(delegate.dependecies.aiImanager)
-                .environment(delegate.dependecies.avatarManager)
-                .environment(delegate.dependecies.chatManager)
-                .environment(delegate.dependecies.logManager)
+            AppView()
+                .environment(dependencies)
+                .environment(dependencies.authManager)
+                .environment(dependencies.userManager)
+                .environment(dependencies.avatarManager)
+                .environment(dependencies.chatManager)
+                .environment(dependencies.aiImanager)
+                .environment(dependencies.logManager)
         }
     }
 }
 
 class AppDelegate: NSObject, UIApplicationDelegate {
-    
-    var dependecies: Dependencies!
-    
+
+    var dependencies: Dependencies!
+
     func application(
         _ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
     ) -> Bool {
-       
-     let config: BuildConfiguration
-       #if MOCK
+
+        let config: BuildConfiguration
+        #if MOCK
         config = .mock
-       #elseif DEV
+        #elseif DEV
         config = .dev
-       #else
+        #else
         config = .production
-       #endif
+        #endif
         config.configure()
-        dependecies = Dependencies(configuration: config)
+        dependencies = Dependencies(configuration: config)
         return true
     }
 
@@ -90,13 +96,22 @@ enum BuildConfiguration {
     }
 }
 
-struct Dependencies {
-    let authManager: AuthManager!
-    let userManager: UserManager!
-    let aiImanager: AIManager!
-    let avatarManager: AvatarManager!
-    let chatManager: ChatManager!
-    let logManager: LogManager!
+@Observable
+@MainActor
+final class Dependencies {
+
+    // MARK: - Existing Managers (keep as-is)
+    let authManager: AuthManager
+    let userManager: UserManager
+    let aiImanager: AIManager
+    let avatarManager: AvatarManager
+    let chatManager: ChatManager
+    let logManager: LogManager
+
+    // MARK: - NEW: Repositories
+    let avatarRepository: AvatarRepositoryProtocol
+    let userRepository: UserRepositoryProtocol
+    let authRepository: AuthRepositoryProtocol
     
     init(configuration: BuildConfiguration) {
         
@@ -129,26 +144,50 @@ struct Dependencies {
                 FirebaseAnalyticsService()
             ])
         }
+        
+        // NEW: Initialize repositories (same for all configurations)
+        avatarRepository = RemoteAvatarRepository(avatarManager: avatarManager)
+        userRepository = UserRepository(userManager: userManager)
+        authRepository = AuthRepository(authManager: authManager)
+    }
+    
+    // MARK: - NEW: ViewModel Factories
+    
+    /// Factory method to create ProfileViewModel with all dependencies
+    func makeProfileViewModel() -> ProfileViewModel {
+        // Create Use Cases
+        let fetchUserAvatarsUseCase = RemoteFetchUserAvatarsUseCase(
+            avatarRepository: avatarRepository
+        )
+        
+        let deleteAvatarUseCase = DefaultDeleteAvatarUseCase(
+            avatarRepository: avatarRepository
+        )
+        
+        let getCurrentUserUseCase = DefaultGetCurrentUserUseCase(
+            userRepository: userRepository,
+            authRepository: authRepository
+        )
+        
+        // Create and return ViewModel
+        return ProfileViewModel(
+            fetchUserAvatarsUseCase: fetchUserAvatarsUseCase,
+            deleteAvatarUseCase: deleteAvatarUseCase,
+            getCurrentUserUseCase: getCurrentUserUseCase
+        )
     }
 }
 
 extension View {
-    func previewEnvironment(
-        isSignedIn: Bool = true,
-        shouldFail: Bool = false,
-        isEmpty: Bool = false,
-        delay: CGFloat = 0
-    ) -> some View {
-        self
-            .environment(AIManager(aiService: MockAIService()))
-            .environment(AvatarManager(
-                service: MockAvatarService(shouldFail: shouldFail, isEmpty: isEmpty, delay: delay),
-                local: MockLocalAvatarPersistence()
-            ))
-            .environment(UserManager(services: MockUserServices(userModal: isSignedIn ? .mock : nil)))
-            .environment(AuthManager(authService: MockAuthService(user: isSignedIn ? .mock() : nil)))
-            .environment(ChatManager(chatService: MockChatMessageService()))
-            .environment(AppState())
-            .environment(LogManager(services: [ConsoleService()]))
-    }
-}
+     func previewEnvironment() -> some View {
+         let mockDependencies = Dependencies(configuration: .mock)
+         return self
+             .environment(mockDependencies)
+             .environment(mockDependencies.authManager)
+             .environment(mockDependencies.userManager)
+             .environment(mockDependencies.avatarManager)
+             .environment(mockDependencies.chatManager)
+             .environment(mockDependencies.aiImanager)
+             .environment(mockDependencies.logManager)
+     }
+ }

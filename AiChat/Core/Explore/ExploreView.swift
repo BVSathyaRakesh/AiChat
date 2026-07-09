@@ -221,17 +221,7 @@ struct ExploreView: View {
     }
 }
 
-#Preview("Loaded - With Data") {
+#Preview() {
     ExploreView()
-        .previewEnvironment(delay: 0.5)
-}
-
-#Preview("Error - No Connection") {
-    ExploreView()
-        .previewEnvironment(shouldFail: true, delay: 0.5)
-}
-
-#Preview("Empty - No Data") {
-    ExploreView()
-        .previewEnvironment(isEmpty: true, delay: 0.5)
+        .previewEnvironment()
 }
